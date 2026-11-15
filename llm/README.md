@@ -1,133 +1,161 @@
-# Lộ trình học LLM
+# LLM Learning Roadmap
 
-[Trang chủ AI-101](../README.md) · [Bắt đầu với tổng quan và chẩn đoán](00-overview-diagnostic/README.md)
+[AI-101 home](../README.md) · [LLM systems map](00-llm-systems-map/README.md)
 
-Lộ trình đưa người học từ nền tảng đến khả năng tự xây một GPT nhỏ, điều chỉnh mô hình có sẵn, đánh giá kết quả và triển khai một hệ thống LLM ở phạm vi dự án nhỏ. Mục tiêu dài hạn là có cơ sở để đọc paper và chọn một hướng nghiên cứu chuyên sâu.
+A curriculum for learners with strong programming and ML foundations who want to understand **how LLMs work and how their mechanisms shape practical systems**.
 
-**Quy mô:** 15 submodule, khoảng **280 giờ học và thực hành chủ động**, chưa bao gồm thời gian máy chạy dài. Thời lượng là ước lượng biên soạn của chương trình, không phải yêu cầu chính thức của một khóa học hay cam kết đạt trình độ trong một thời hạn cố định.
+The core covers representations, architecture, context, training, decoding, adaptation, reasoning, retrieval, and agents. Implementation can be delegated to an agent. The learner defines the experiment, interprets the evidence, and makes the technical decision.
 
-**Trạng thái nội dung:** các README là layout và đề bài để contributor phát triển thành bài học. Theo dõi phần đã hoàn thiện bằng checklist tại từng submodule.
+**Scope:** 15 submodules and approximately **160 hours of active study and analysis**. Machine runtimes, infrastructure delays, and optional technical extensions are excluded.
 
-## Mục tiêu đầu ra
+The main architectural reference is the decoder-only autoregressive Transformer. Encoder-based models, encoder–decoder models, mixture-of-experts architectures, and multimodal variants appear where they clarify a mechanism or research direction.
 
-- Giải thích đường đi từ văn bản qua tokenizer, embedding và Transformer đến token được sinh ra.
-- Hiểu loss, gradient, optimizer và vai trò của dữ liệu trong quá trình huấn luyện.
-- Tự xây, huấn luyện, lưu và kiểm tra một mô hình kiểu GPT nhỏ.
-- Chọn can thiệp phù hợp: dữ liệu, prompt, fine-tuning, retrieval hoặc cách suy luận.
-- Thiết kế phép so sánh có baseline, tập đánh giá tách biệt và phân tích regression.
-- Đọc được claim, giả thiết, phương pháp và bằng chứng của một paper.
-- Tích hợp mô hình vào một dự án có chất lượng, hiệu năng và giới hạn được đo rõ.
+**Content status:** these READMEs are detailed learning outlines and experiment specifications. Their checklists track the production of complete lessons, examples, and verified artifacts.
 
-## Điều kiện đầu vào
+## Assumed background
 
-Người học cần Python căn bản: hàm, cấu trúc dữ liệu, thao tác file và đọc lỗi. Kiến thức tensor, xác suất và đạo hàm sẽ được ôn hoặc bổ sung ở submodule 01–02.
+- Comfortable programming and working with technical tools and documentation.
+- Familiarity with standard ML training, optimization, generalization, and evaluation workflows.
+- Working intuition for probabilities, vectors, and functions.
+- Ability to read an experimental comparison and question its assumptions.
 
-Tại submodule 00, tự kiểm tra khả năng viết một chương trình xử lý dữ liệu, xác định shape phép nhân ma trận, giải thích đạo hàm và xác suất có điều kiện. Nếu đã vững một phần, làm bài kiểm tra và thực hành của phần đó trước khi học nhanh qua.
+This roadmap does not repeat Python fundamentals, introductory ML, chatbot usage, or prompt-writing tutorials. Mathematical derivations and tensor implementation are available as optional depth when they answer a concrete question.
 
-## Layout các submodule
+## Learning outcomes
 
-Các số trong cột tiên quyết chỉ submodule cần nắm trước. Danh sách được sắp theo tuyến học chính; sau nền tảng, một số phần ứng dụng có thể học song song nếu đã đạt điều kiện đầu vào.
+By completing the core, learners should be able to:
 
-| Mã | Submodule | Giờ | Tiên quyết chính | Sản phẩm hoặc năng lực cần đạt |
+- Explain autoregressive language modeling, tokenization effects, representations, and the route from context to output distributions.
+- Trace information through a Transformer and connect architectural choices to context use and inference costs.
+- Distinguish conditioning, in-context learning, parameter updates, retrieval, and application state.
+- Interpret training and scaling evidence while separating effects of data, parameters, compute, and evaluation conditions.
+- Explain how decoding, adaptation, preference optimization, and inference-time computation change behavior.
+- Design controlled studies and recognize confounding, contamination, scoring problems, and unsupported mechanistic claims.
+- Choose serving, retrieval, and agent architectures using measured quality, reliability, latency, and cost.
+- Direct implementation work and defend the resulting conclusion using inspectable artifacts.
+
+## How to study each mechanism
+
+1. **State the mechanism:** identify what computation, objective, or system component is being examined.
+2. **Predict a consequence:** specify an observable change and a plausible competing explanation.
+3. **Design the comparison:** fix the relevant data, model, budget, and evaluation conditions.
+4. **Delegate execution:** give an implementation agent the experiment specification and required artifacts.
+5. **Inspect the evidence:** check configurations, raw outputs, measurements, and representative failures.
+6. **Make the decision:** explain what the result supports, what it leaves unresolved, and what should change next.
+
+Agent-authored code can reduce implementation effort. It does not remove the need to check whether the implemented comparison answers the intended question.
+
+## Submodule layout
+
+Prerequisites refer to concepts, not mandatory seat time. Skip a module when you can already satisfy its completion criteria. After the shared foundation, application branches can be studied according to the problem being solved.
+
+| ID | Submodule | Hours | Main prerequisites | Main question or deliverable |
 | --- | --- | ---: | --- | --- |
-| 00 | [Tổng quan và chẩn đoán](00-overview-diagnostic/README.md) | 4 | Python căn bản | Bản đồ vòng đời LLM và danh sách kiến thức cần bổ sung. |
-| 01 | [Toán và tensor](01-math-foundations/README.md) | 16 | 00 | Theo dõi đúng shape, xác suất và gradient trên ví dụ nhỏ. |
-| 02 | [Neural network và PyTorch](02-neural-networks-pytorch/README.md) | 20 | 01 | Training loop tự viết và khả năng chẩn đoán lỗi huấn luyện. |
-| 03 | [Language modeling và tokenization](03-language-modeling-tokenization/README.md) | 16 | 01–02 | Bigram LM, input–target đúng và vòng lấy mẫu token. |
-| 04 | [Attention và Transformer](04-attention-transformer/README.md) | 24 | 01–03 | Attention và decoder block với causal mask được kiểm tra. |
-| 05 | [Tự xây GPT nhỏ](05-build-tiny-gpt/README.md) | 24 | 02–04 | Mô hình nhỏ huấn luyện, khôi phục checkpoint và sinh văn bản được. |
-| 06 | [Dữ liệu và pretraining](06-data-pretraining/README.md) | 22 | 05 | Data card và một thí nghiệm xử lý dữ liệu có kiểm soát. |
-| 07 | [Đánh giá LLM](07-evaluation/README.md) | 20 | 05–06 | Bộ đánh giá, kiểm scorer và báo cáo lỗi theo nhóm. |
-| 08 | [SFT và PEFT](08-sft-peft/README.md) | 24 | 06–07 | Thí nghiệm fine-tuning với baseline và kiểm regression. |
-| 09 | [Alignment và reasoning](09-alignment-reasoning/README.md) | 20 | 07–08 | Phân biệt SFT/DPO/RL và so sánh reasoning theo ngân sách suy luận. |
-| 10 | [Inference và serving](10-inference-serving/README.md) | 18 | 05, 07 | Benchmark chất lượng, độ trễ, throughput và bộ nhớ. |
-| 11 | [Retrieval và RAG](11-retrieval-rag/README.md) | 18 | 03, 07 | Hỏi đáp tài liệu có đánh giá retrieval và generation riêng. |
-| 12 | [Tool use và agent](12-tool-use-agents/README.md) | 14 | 07, 11 | Agent nhỏ có điều kiện dừng, xử lý lỗi và kiểm kết quả. |
-| 13 | [Đọc paper và hướng chuyên sâu](13-research-frontiers/README.md) | 12 | 05–07 | Bản phân tích paper và đề xuất một thí nghiệm đối chứng. |
-| 14 | [Đồ án tổng hợp](14-capstone/README.md) | 28 | 07, 10–11; thêm 08 nếu fine-tune, 12 nếu dùng agent | Dự án nhỏ có demo, cấu hình tái lập và báo cáo đánh giá. |
-| | **Tổng** | **280** | | |
+| 00 | [LLM systems map](00-llm-systems-map/README.md) | 2 | The assumed ML background | Locate the boundary between the model, training pipeline, inference procedure, and application. |
+| 01 | [Language modeling and representations](01-language-modeling-representations/README.md) | 8 | 00 | Explain the modeling objective and how tokenization and representations affect behavior. |
+| 02 | [Transformer architecture and information flow](02-transformer-architecture/README.md) | 12 | 01 | Trace causal information flow and connect attention, position, and block structure to model behavior. |
+| 03 | [Context dynamics and in-context learning](03-context-and-in-context-learning/README.md) | 10 | 01–02 | Distinguish conditioning from learning through parameter updates and test effective context use. |
+| 04 | [Training dynamics and scaling](04-training-dynamics-scaling/README.md) | 12 | 01–02 | Interpret learning curves and data/parameter/compute tradeoffs without overstating scaling evidence. |
+| 05 | [Decoding, uncertainty and model behavior](05-decoding-model-behavior/README.md) | 10 | 01–03 | Study how decoding changes output distributions and why likelihood, confidence, and correctness differ. |
+| 06 | [Data pipelines and pretraining design](06-data-pretraining/README.md) | 12 | 04 | Assess data mixtures, curation, contamination, and controlled data interventions. |
+| 07 | [Evaluation and experimental design](07-evaluation/README.md) | 14 | 04–06 | Build an evaluation that can distinguish a useful change from scoring artifacts or confounding. |
+| 08 | [Fine-tuning and parameter-efficient adaptation](08-sft-peft/README.md) | 12 | 04, 06–07 | Explain SFT targets and adapter mechanisms, then assess adaptation and preserved capabilities. |
+| 09 | [Alignment, reasoning and inference-time compute](09-alignment-reasoning/README.md) | 12 | 05, 07–08 | Compare learning signals and reasoning procedures under explicit quality and compute budgets. |
+| 10 | [Inference systems and serving](10-inference-serving/README.md) | 10 | 02, 05, 07 | Explain prefill, decode, KV caching, and serving tradeoffs using measured workloads. |
+| 11 | [Retrieval architectures and RAG](11-retrieval-rag/README.md) | 12 | 03, 07 | Separate retrieval and generation failures and evaluate a justified retrieval intervention. |
+| 12 | [Tool use and agent architectures](12-tool-use-agents/README.md) | 10 | 07, 11 | Analyze the model policy, orchestration, state, tool contracts, and workflow reliability. |
+| 13 | [Research frontiers and claim assessment](13-research-frontiers/README.md) | 8 | 02, 04, 07; topic-specific additions | Assess an LLM research claim and design a discriminating follow-up study. |
+| 14 | [Capstone project](14-capstone/README.md) | 16 | 07, 10–11; add 08 for adaptation and 12 for agents | Reuse prior artifacts to deliver a system and defend one measured design intervention. |
+| | **Total** | **160** | | |
 
-## Sáu chặng học
+## Learning stages
 
-| Chặng | Submodule | Trọng tâm |
+| Stage | Modules | Focus |
 | --- | --- | --- |
-| A. Nền tảng | 00–02 | Hiểu bài toán, toán và cách mạng neural học. |
-| B. Cơ chế LLM | 03–05 | Hiểu token, Transformer và tự xây mô hình nhỏ. |
-| C. Huấn luyện và đo lường | 06–07 | Thiết kế dữ liệu và đánh giá đúng. |
-| D. Cải thiện mô hình | 08–09 | Fine-tuning, preference learning và reasoning. |
-| E. Hệ thống thực tế | 10–12 | Serving, RAG và sử dụng công cụ. |
-| F. Tổng hợp và nghiên cứu | 13–14 | Phân tích paper và hoàn thành dự án độc lập. |
+| A. Establish the LLM model | 00–02 | Systems boundaries, language modeling, representations, and Transformer computation. |
+| B. Explain behavior and learning | 03–05 | Context, in-context learning, training/scaling, and decoding. |
+| C. Establish trustworthy evidence | 06–07 | Data interventions, contamination, evaluation, and experimental validity. |
+| D. Change model behavior | 08–09 | SFT, adapters, preference optimization, reasoning, and inference-time compute. |
+| E. Design complete systems | 10–12 | Inference infrastructure, retrieval, and agent architectures. |
+| F. Integrate and investigate | 13–14 | Research claims, targeted experiments, and a practical system. |
 
-Đánh giá cơ bản bắt đầu từ submodule 02: chia dữ liệu, theo dõi train/validation và kiểm lỗi. Submodule 07 hệ thống hóa các kỹ năng đó. Thiết kế thí nghiệm bắt đầu từ submodule 06 và được dùng lại trong các phần sau.
+These stages organize the material; they do not postpone experimental work. Each mechanism module includes a controlled study or analysis of clearly attributed run artifacts.
 
-## Cấu trúc của một submodule
+## Four competency checkpoints
 
-Mỗi README gồm mục tiêu, kiến thức tiên quyết, checklist nội dung cần biên soạn, thực hành đề xuất, câu hỏi tự kiểm tra, checklist hoàn thiện, nguồn tham khảo và điều kiện hoàn thành.
-
-Khi phát triển bài học, dùng trình tự: câu hỏi thực tế, trực giác, cơ chế hoặc công thức, ví dụ cụ thể, thực hành, trường hợp sai và kiểm tra độc lập. Có thể thêm các file như bài giải thích, notebook, script hoặc hình minh họa trong thư mục submodule rồi dẫn link từ README.
-
-## Bốn mốc kiểm tra năng lực
-
-| Mốc | Bằng chứng người học cần tự tạo |
+| Checkpoint | Evidence of understanding |
 | --- | --- |
-| Sau 03 | Giải thích được trọng số, gradient và lấy mẫu; tạo input–target chính xác. |
-| Sau 05 | Theo dõi một câu từ token đến logits; sửa được lỗi shape, nhãn hoặc causal mask. |
-| Sau 09 | Chọn can thiệp có lý do, thiết kế so sánh và nhận ra regression. |
-| Sau 14 | Tự hoàn thành dự án nhỏ, tái lập kết quả và bảo vệ quyết định kỹ thuật. |
+| After 03 | Explain the route from tokens through Transformer computation to an output distribution; distinguish context conditioning from parameter updates. |
+| After 07 | Design and interpret a controlled comparison while identifying data, compute, decoding, and evaluation confounders. |
+| After 09 | Explain how an adaptation or reasoning method changes the learning signal or inference procedure and evaluate its tradeoffs. |
+| After 14 | Defend a complete system design, trace its reported results to evidence, and explain the limits of one intervention. |
 
-Mỗi mốc kiểm tra bốn khả năng: **giải thích**, **theo dõi cơ chế**, **tự thực hiện** và **chẩn đoán lỗi**. Nếu chưa đạt, quay lại submodule chứa kỹ năng còn thiếu và thử một ví dụ khác.
+Completion is based on explanation, prediction, experimental judgment, and technical decisions. Writing every implementation personally or reproducing long derivations is not required.
 
-## Nhịp học gợi ý
+## Experiment contract
 
-| Phương án | Nhịp học | Thời gian ước lượng |
-| --- | --- | --- |
-| Chuẩn | 10–12 giờ mỗi tuần | Khoảng 24–28 tuần; điều chỉnh theo bài thực hành. |
-| Tập trung | Khoảng 20 giờ mỗi tuần, đã vững Python và deep learning cơ bản | Khoảng 14–16 tuần, có thời gian sửa lỗi và ôn lại. |
+Each lab should state:
 
-Có thể bắt đầu với 30% thời gian đọc/học, 50% code và thí nghiệm, 20% giải thích lại và tổng kết. Đây là cách phân bổ đề xuất; tăng thời gian cho phần đang yếu. Nếu cần học Python từ đầu, bổ sung thời gian chuẩn bị ngoài 280 giờ này.
-
-## Môi trường và bằng chứng thực hành
-
-- Bắt đầu bằng Python, PyTorch và ví dụ nhỏ; kiểm tính đúng trước khi chạy thí nghiệm lớn.
-- Chọn model, batch và context sau khi đo tài nguyên thực tế; README này không giả định một GPU cụ thể.
-- Ghi phiên bản thư viện, model/tokenizer, dữ liệu, cấu hình và seed khi chúng ảnh hưởng đến việc tái lập.
-- Ghi rõ kết quả nào đã chạy, kết quả nào chỉ là kỳ vọng hoặc ví dụ minh họa.
-- Với bài đánh giá, giữ dev/test tách biệt và lưu đủ thông tin để kiểm từng dự đoán.
-- Lưu code, notebook, báo cáo và hình tại submodule tương ứng; tài liệu lớn hoặc model weights nên có hướng dẫn lấy về thay vì đưa trực tiếp vào Git.
-
-## Cách dùng checklist khi đóng góp
-
-Checkbox trong từng submodule theo dõi **tiến độ biên soạn nội dung**. Đánh dấu khi đã có phần giải thích, ví dụ, bài thực hành hoặc tài liệu kiểm chứng tương ứng. Hướng dẫn chi tiết nằm tại [README gốc](../README.md).
-
-Bảng layout ở trên không lưu bản sao checkbox hay phần trăm tiến độ. Contributor cập nhật checklist ngay trong README của submodule để tránh hai nơi phản ánh trạng thái khác nhau.
-
-Các mục tiêu và điều kiện hoàn thành dành cho người học là tiêu chí tự đánh giá. Tiến độ học của từng cá nhân nên được ghi riêng, không thay đổi checkbox nội dung dùng chung chỉ vì đã học xong phần đó.
-
-## Nhánh đào sâu sau phần cốt lõi
-
-| Nhánh | Chủ đề có thể mở rộng | Nền tảng nên vững |
-| --- | --- | --- |
-| Dữ liệu và fine-tuning | Data mixture, synthetic data, multi-domain training, forgetting | 06–09 |
-| Kiến trúc | Mixture of Experts, long context, state-space và kiến trúc lai | 01–06 |
-| Reasoning và RL | Reward design, policy optimization, verifier, test-time compute | 07–09 |
-| Hệ thống | Distributed training, sharding, parallelism, kernel, scheduler | 02, 05–06, 10 |
-| Đánh giá và độ tin cậy | Calibration, robustness, OOD, judge evaluation, interpretability | 07–09 |
-| Multimodal | Vision-language, ảnh/video/audio và dữ liệu liên kết | 03–08 |
-| Agent | Planning, memory, tác vụ dài và phối hợp nhiều agent | 10–12 |
-
-Submodule 13 giới thiệu bản đồ các nhánh này. Việc triển khai chuyên sâu sẽ là nội dung mở rộng, ngoài ngân sách cốt lõi 280 giờ.
-
-## Tài liệu nền tảng
-
-| Nguồn | Vai trò trong lộ trình |
+| Element | Required detail |
 | --- | --- |
-| [Dive into Deep Learning — Preliminaries](https://d2l.ai/chapter_preliminaries/index.html) | Toán, tensor, tự động vi phân và xác suất. |
-| [PyTorch — Learn the Basics](https://docs.pytorch.org/tutorials/beginner/basics/intro.html) | Tensor, data loader, model, autograd, optimization và checkpoint. |
-| [Karpathy — Neural Networks: Zero to Hero](https://karpathy.ai/zero-to-hero.html) | Backprop, mô hình ngôn ngữ nhỏ, GPT và tokenizer. |
-| [Raschka — LLMs from Scratch](https://github.com/rasbt/LLMs-from-scratch) | Trục thực hành xây GPT, huấn luyện và fine-tuning. |
-| [Hugging Face — LLM Course](https://huggingface.co/learn/llm-course/chapter1/1) | Làm việc với model, dataset, tokenizer và fine-tuning thực tế. |
-| [Stanford CS336](https://cs336.stanford.edu/) | Đào sâu architecture, data, scaling, systems và alignment sau khi có nền tảng. |
-| [EleutherAI — Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness) | Thiết kế và thực hiện evaluation có cấu hình. |
-| [vLLM Documentation](https://docs.vllm.ai/en/latest/) | Inference, serving và benchmark. |
+| Question and hypothesis | The mechanism under study, expected observation, and competing explanation. |
+| Intervention and controls | What changes, what stays fixed, and what cannot be controlled or observed. |
+| Execution specification | Data, model, configurations, resource limits, and the implementation agent's deliverables. |
+| Evidence | Raw outputs, run records, measurements, examples, and provenance for reviewed artifacts. |
+| Acceptance and interpretation | Checks that establish a valid comparison, permissible conclusions, and unresolved limitations. |
 
-Các submodule dẫn thêm paper gốc và tài liệu chuyên biệt. Nguồn nền tảng đã được rà soát ngày **15/11/2026**; khi thêm hướng dẫn thực thi, kiểm lại tài liệu tương ứng với phiên bản đang dùng.
+Use a bounded local model, an appropriate hosted system, or source-provided artifacts according to the question. A black-box API cannot support every claim about model internals; choose an observable setup or narrow the conclusion. Reviewing existing evidence is valid when explicitly identified, but must not be reported as a new execution.
+
+## Core understanding and optional depth
+
+The core keeps the mechanisms needed for sound technical decisions. It uses diagrams, concise equations where useful, controlled interventions, and inspectable results.
+
+| Core understanding | Optional technical extension |
+| --- | --- |
+| What representations, attention, position, and residual paths do. | Tensor-shape drills, full matrix derivations, and Transformer implementation from scratch. |
+| How objectives, data, budgets, and training dynamics shape a model. | Gradient derivations, optimizer implementation, distributed training, and large scaling reproductions. |
+| How adapters, quantization, and preference objectives change behavior or resource needs. | Detailed LoRA/QLoRA mathematics and manual training-algorithm implementation. |
+| How decoding, caching, batching, retrieval, and tools affect a system. | Kernel implementation, custom serving engines, and framework internals. |
+| How evidence supports an architectural or deployment decision. | Advanced statistical derivations, large replication programs, and new-method research. |
+
+Optional depth is outside the 160-hour estimate and does not block progress through the core. Familiarity with a formula is useful when it explains a mechanism; lengthy manipulation is not a learning goal by itself.
+
+## Suggested pacing
+
+| Schedule | Weekly effort | Approximate duration |
+| --- | --- | --- |
+| Alongside other work | 8–10 hours | 16–20 weeks. |
+| Focused study | 12–15 hours | 11–14 weeks. |
+
+These estimates include reading, designing studies, reviewing agent-produced artifacts, and explaining conclusions. They exclude long training runs. The 16-hour capstone assumes reuse of the evaluation and system artifacts from earlier modules.
+
+Experienced learners may move directly to a branch after demonstrating its prerequisites. For practical system work, modules 10–12 can follow the shared foundation and evaluation without first completing every adaptation topic.
+
+## Evidence and reproducibility
+
+- Record model, tokenizer, data, code, and configuration versions with executable artifacts.
+- Preserve raw predictions and measurement units, along with failures and resource assumptions.
+- Keep decisions based on development evidence separate from final held-out comparisons.
+- Distinguish measurement, author-reported result, illustration, and hypothesis.
+- Do not use generated rationales or attention displays alone as proof of a model's internal reasoning.
+- State what is observable when using a hosted model and avoid guessing hidden implementation details.
+- Keep supporting files in their submodule and provide retrieval instructions for large datasets or weights.
+
+## Contributor checklist conventions
+
+Checkboxes record **shared content readiness**, not individual learning progress. Mark an item only after its explanation, experiment, or verification material exists and has been checked. Follow the [root contribution workflow](../README.md).
+
+The roadmap table provides navigation. Each submodule maintains its own authoring checklist and separate learner completion criteria.
+
+## Using references
+
+The primary papers linked in each submodule establish the mechanisms and empirical claims. Read the parts needed to answer that module's question; an entire external course is not a prerequisite.
+
+| Resource | Role |
+| --- | --- |
+| [Stanford CS336](https://cs336.stanford.edu/) | Selected LLM architecture, data, scaling, systems, and alignment material; from-scratch assignments are optional. |
+| [EleutherAI Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness) | Evaluation implementation and task definitions to inspect and adapt through an agent. |
+| [vLLM documentation](https://docs.vllm.ai/en/latest/) | Serving concepts, configuration behavior, and measurement references for the version in use. |
+| [Raschka — LLMs from Scratch](https://github.com/rasbt/LLMs-from-scratch) | Optional implementation detail when a mechanism benefits from examining code. |
+
+Roadmap revised **15 November 2026**. Recheck version-dependent instructions when adding executable material.

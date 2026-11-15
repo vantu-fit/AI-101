@@ -1,86 +1,102 @@
-# 10 · Suy luận và phục vụ mô hình
+# 10 · Inference Systems and Serving
 
-[Trang chủ](../../README.md) · [Lộ trình LLM](../README.md)
+[Home](../../README.md) · [LLM Roadmap](../README.md)
 
-**Thời lượng dự kiến:** 18 giờ.
+**Estimated core time:** 10 hours. Optional technical extensions are outside this budget.
 
-**Tiên quyết:** [Attention và Transformer](../04-attention-transformer/README.md), [Xây dựng Tiny GPT](../05-build-tiny-gpt/README.md), [Đánh giá mô hình](../07-evaluation/README.md).
+**Prerequisites:** [Transformer Architecture](../02-transformer-architecture/README.md), [Decoding and Model Behavior](../05-decoding-model-behavior/README.md), [Model Evaluation](../07-evaluation/README.md).
 
-**Trạng thái:** Khung nội dung; các mục chưa đánh dấu đang chờ biên soạn hoặc kiểm tra.
+**Status:** Content scaffold; unchecked items are awaiting authoring or review.
 
-Các checkbox phản ánh độ sẵn sàng của nội dung dùng chung, không phải tiến độ học của từng người.
+Checkboxes track shared content readiness.
 
-## Mục tiêu
+## Learning objectives
 
-Sau mô-đun này, người học có thể:
+After this module, learners will be able to:
 
-- Phân biệt prefill và decode, giải thích vì sao hai giai đoạn có đặc điểm tính toán khác nhau.
-- Ước lượng bộ nhớ cho trọng số, KV cache và phần bộ nhớ phát sinh khi phục vụ yêu cầu.
-- Đọc các chỉ số độ trễ, thông lượng và chất lượng để chọn cấu hình phục vụ phù hợp.
-- Thiết kế phép đo có kiểm soát trước khi đề xuất tối ưu bằng batching, precision hoặc vLLM.
+- Explain the different compute, memory traffic, and scheduling demands of prefill and autoregressive decode.
+- Relate KV cache growth, GQA, precision, and batching to capacity and latency constraints.
+- Distinguish architectural changes, runtime optimizations, and workload effects in serving comparisons.
+- Design a controlled measurement and justify a configuration from quality, latency, throughput, and memory evidence.
 
-## Checklist nội dung
+## Content checklist
 
-- [ ] Viết sơ đồ vòng đời yêu cầu từ token hóa đến prefill, decode và trả kết quả; chỉ rõ điểm bắt đầu, kết thúc của từng phép đo.
-- [ ] Bổ sung ví dụ tính dung lượng KV cache, nêu số lớp, số KV head, độ dài chuỗi, batch và kiểu dữ liệu; phân biệt MHA với GQA/MQA.
-- [ ] Soạn bảng ngân sách bộ nhớ gồm trọng số, KV cache, activation, bộ nhớ tạm và phần dự phòng; ghi rõ phạm vi của phép ước lượng.
-- [ ] Giải thích FP32, BF16/FP16 và lượng tử hóa khi suy luận; thêm quy trình kiểm tra sai lệch chất lượng và khả năng hỗ trợ của phần cứng.
-- [ ] Minh họa static batching và continuous batching; chỉ rõ ảnh hưởng của độ dài đầu vào, đầu ra và mức đồng thời.
-- [ ] Định nghĩa TTFT, thời gian giữa các token, độ trễ toàn yêu cầu, thông lượng và phân vị; nêu cách xử lý yêu cầu lỗi hoặc hết thời gian.
-- [ ] Xây dựng hướng dẫn profiling giúp phân biệt nút thắt tính toán, băng thông bộ nhớ, CPU và hàng đợi; tách warm-up khỏi phép đo chính.
-- [ ] Biên soạn lab vLLM có phiên bản cố định, cấu hình tải và giới hạn tài nguyên; cung cấp phương án mô hình nhỏ khi thiếu GPU phù hợp.
+- [ ] Map prefill, decode, and queueing to compute and memory traffic; explain why the dominant bottleneck depends on hardware and workload.
+- [ ] Relate KV cache growth to sequence length, layer count, KV heads, and dtype; separate request state from weights, activations, and temporary workspaces.
+- [ ] Compare MHA, MQA, and GQA as architectural choices; explain why changing the KV head count is not a generic serving toggle.
+- [ ] Explain continuous batching, sequence scheduling, padding, and paged KV allocation through their effects on utilization and latency.
+- [ ] Compare weight and KV cache quantization, memory savings, kernel support, and output quality; distinguish reduced storage from measured speedup.
+- [ ] Define TTFT, inter-token latency, request latency, throughput, latency percentiles, and failure rates with explicit measurement boundaries.
+- [ ] Specify workload distributions, arrival/concurrency conditions, warm-up, repetitions, stop rules, and quality checks for a fair benchmark.
+- [ ] Prepare a vLLM profiling exercise that links configuration changes to exposed measurements and labels unavailable metrics or unresolved bottlenecks.
 
-## Thực hành đề xuất
+## Proposed lab
 
-### Bài toán
+Measure how concurrency interacts with input length for one fixed model and serving runtime.
 
-Phục vụ cùng một mô hình trên một tập yêu cầu cố định và khảo sát tác động của độ dài ngữ cảnh cùng mức đồng thời.
-Dùng cấu hình ban đầu làm mốc; mỗi lần chỉ thay đổi một yếu tố để giải thích được chênh lệch quan sát.
+**Responsibilities:** The learner owns the hypothesis, controls, and interpretation; the implementation agent configures, profiles, and executes the benchmark.
 
-### Sản phẩm bàn giao
+### Experiment specification for an implementation agent
 
-- Bản mô tả mô hình, tokenizer, phần cứng, phần mềm và cấu hình sinh văn bản.
-- Tập yêu cầu thử nghiệm với độ dài đầu vào, ngân sách đầu ra và lịch gửi yêu cầu được lưu lại.
-- Bảng phép đo gồm độ trễ, thông lượng, bộ nhớ đỉnh, lỗi và kiểm tra chất lượng đầu ra.
-- Ghi chú profiling giải thích một nút thắt, một thay đổi được thử và giới hạn của kết luận.
+| Element | Specification |
+| --- | --- |
+| Question | How does increasing concurrency change throughput, TTFT, and KV memory for short versus long inputs? |
+| Prediction | Throughput should rise before saturation; the long-input cohort should reach memory or latency constraints earlier. Treat this as a hypothesis to test. |
+| Intervention | Compare at least two concurrency settings within each of two fixed input-length cohorts. |
+| Controls | Hold model, tokenizer, hardware, runtime version, precision, decoding, output limits, request order, and repetition policy fixed within each comparison. |
+| Execution | Record warm-up separately; capture actual input/output token counts, stopping reasons, failures, timings, and available memory/profile data for every condition. |
 
-### Tiêu chí nghiệm thu
+### Inspectable artifacts
 
-- Có cách tái chạy phép đo và phân biệt số liệu quan sát với ước lượng lý thuyết.
-- So sánh dùng cùng workload và cấu hình sinh, trừ yếu tố đang khảo sát; ghi riêng warm-up và số lần lặp.
-- Báo cáo đơn vị, phân vị, số yêu cầu thành công và lỗi; không chỉ trình bày một giá trị thông lượng trung bình.
-- Nếu không chạy được vLLM trên phần cứng hiện có, ghi rõ giới hạn và hoàn thành phép đo nhỏ phù hợp; không suy rộng thành kết quả vLLM.
+- A configuration manifest with model architecture, KV head count, precision, hardware, runtime, and workload definitions.
+- Per-request logs, actual token lengths, stopping reasons, error records, and available profiler or memory traces.
+- Condition-level latency distributions, throughput, peak memory, and output quality checks with units and sample counts.
+- A bottleneck assessment separating observed evidence, estimates, and alternative explanations.
 
-## Câu hỏi tự kiểm tra
+### Acceptance criteria
 
-1. Vì sao giảm thời gian prefill chưa chắc làm giảm đáng kể thời gian hoàn tất một câu trả lời dài?
+- Compare conditions using the recorded workload and controls; explain deviations such as unequal generated lengths or early stopping.
+- Account for failures and queueing, and distinguish TTFT from decode latency; client timing alone cannot establish a server-side bottleneck.
+- Relate at least one observed tradeoff to batching, KV capacity, or runtime behavior without claiming architectural causality from unmatched models.
+- A configuration choice is supported by both output quality and systems measurements; the main comparison can be rerun from the manifest.
 
-   **Gợi ý:** Tách tổng thời gian thành chờ hàng đợi, prefill và nhiều bước decode.
+## Self-check questions
 
-2. Khi tăng độ dài ngữ cảnh và số yêu cầu đồng thời, những thành phần bộ nhớ nào tăng và thành phần nào gần như cố định?
+1. Why can prefill optimization improve TTFT while barely affecting completion time for long outputs?
 
-   **Gợi ý:** So sánh trọng số dùng chung với KV cache của từng chuỗi; xét cả phần bộ nhớ tạm.
+   **Hint:** Separate queueing, prefill, and repeated decode costs, then consider the workload's input/output ratio.
 
-3. Vì sao cấu hình có thông lượng cao nhất có thể không phù hợp cho một ứng dụng hỏi đáp tương tác?
+2. Why does a model with fewer KV heads not automatically provide a fair measurement of GQA's isolated speed benefit?
 
-   **Gợi ý:** Xem TTFT, phân vị độ trễ, hàng đợi và chất lượng bên cạnh tổng token mỗi giây.
+   **Hint:** Check weights, architecture, training, kernels, and hardware; distinguish capacity estimates from a controlled causal comparison.
 
-## Checklist hoàn thiện
+3. How can a quantized configuration use less memory yet fail to improve latency?
 
-- [ ] Kiểm tra ví dụ số và ký hiệu về bộ nhớ, precision, TTFT và thông lượng; ghi rõ giả định.
-- [ ] Chạy lại lab từ môi trường sạch hoặc mô tả được giới hạn phần cứng, phiên bản và tài nguyên cần thiết.
-- [ ] Viết lời giải hoặc đáp án gợi ý đủ để người học tự kiểm tra ba câu hỏi và diễn giải phép đo.
-- [ ] Bổ sung lỗi thường gặp: hết bộ nhớ, benchmark thiếu warm-up, workload thay đổi và đếm sai token.
-- [ ] Kiểm tra liên kết, ngày đối chiếu tài liệu và nhờ một người khác rà soát kết luận cùng hướng dẫn lab.
+   **Hint:** Consider kernel support, conversion overhead, batch size, the active bottleneck, and quality-preserving settings.
 
-## Tài liệu tham khảo
+## Completion checklist
 
-- [Tài liệu chính thức vLLM](https://docs.vllm.ai/en/latest/) — điểm vào cho cấu hình suy luận và phục vụ; cần ghi phiên bản dùng trong lab.
-- [Stanford CS336: Language Modeling from Scratch](https://cs336.stanford.edu/) — tài liệu nền về hệ thống và triển khai mô hình ngôn ngữ.
+- [ ] Verify architecture, memory, and metric examples against their assumptions and primary sources.
+- [ ] Run the experiment specification with pinned configurations and retain raw timings, errors, and profile artifacts.
+- [ ] Add answer guidance and a rubric for bottleneck reasoning, measurement controls, and quality/performance tradeoffs.
+- [ ] Document pitfalls including warm-up leakage, unmatched output lengths, hidden failures, cache effects, and unsupported causal claims.
+- [ ] Check reference versions and ask another contributor to review the benchmark and its interpretation.
 
-## Điều kiện hoàn thành
+## Optional technical deep dive
 
-Người học giải thích được chi phí prefill/decode, lập được ngân sách bộ nhớ có giả định rõ ràng và hoàn thành một so sánh cấu hình phục vụ.
-Báo cáo phải gắn khuyến nghị với workload đã đo, đồng thời nêu giới hạn về chất lượng, độ trễ và phần cứng.
+- Derive KV storage and attention cost formulas; inspect tensor layouts, kernel fusion, and memory access patterns.
+- Profile PagedAttention or other attention kernels and implement a targeted runtime optimization.
+- Explore tensor/pipeline parallelism, prefill/decode disaggregation, and distributed serving under realistic arrival processes.
 
-**Trước:** [09 · Alignment và reasoning](../09-alignment-reasoning/README.md) · **Tiếp:** [11 · Retrieval và RAG](../11-retrieval-rag/README.md)
+## References
+
+- [PagedAttention / vLLM](https://arxiv.org/abs/2309.06180) — KV allocation, fragmentation, and serving design.
+- [GQA](https://arxiv.org/abs/2305.13245) — grouped-query attention and its architectural quality/inference tradeoffs.
+- [Official vLLM Documentation](https://docs.vllm.ai/en/latest/) — runtime configuration and measurement interfaces; pin the version used.
+
+## Completion criteria
+
+Explain the measured serving regime, defend a configuration choice, and identify which bottleneck claims the evidence does and does not support.
+Submit the controlled comparison, its raw artifacts, and a reproducible configuration manifest.
+
+**Previous:** [09 · Alignment and Reasoning](../09-alignment-reasoning/README.md) · **Next:** [11 · Retrieval Architectures and RAG](../11-retrieval-rag/README.md)

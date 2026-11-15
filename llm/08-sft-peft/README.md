@@ -1,92 +1,121 @@
-# 08 · SFT và fine-tuning tiết kiệm tài nguyên
+# 08 · Fine-tuning and parameter-efficient adaptation
 
-[Trang chủ](../../README.md) · [Lộ trình LLM](../README.md)
+[Home](../../README.md) · [LLM roadmap](../README.md)
 
-**Thời lượng dự kiến:** 24 giờ học và thực hành; thời gian huấn luyện phụ thuộc model và phần cứng.
+**Estimated core time:** 12 hours. Optional technical extensions and long training runs are outside this estimate.
 
-**Học trước:** [06 · Dữ liệu và pretraining](../06-data-pretraining/README.md) và [07 · Đánh giá LLM](../07-evaluation/README.md).
+**Prerequisites:** [04 · Training dynamics and scaling](../04-training-dynamics-scaling/README.md), [06 · Data pipelines and pretraining design](../06-data-pretraining/README.md), and [07 · Evaluation and experimental design](../07-evaluation/README.md).
 
-**Trạng thái:** Khung nội dung; các mục chưa đánh dấu đang chờ biên soạn hoặc kiểm tra.
+**Status:** Content scaffold; unchecked items still need to be written or reviewed.
 
-Checkbox theo dõi việc đóng góp và kiểm tra nội dung. Việc người học đạt năng lực được đánh giá riêng ở cuối module.
+Checkboxes track shared content readiness. This module examines adaptation mechanisms, objective specification, and the empirical tradeoffs of full fine-tuning and parameter-efficient methods.
 
-## Mục tiêu
+## Learning objectives
 
-- Hiểu supervised fine-tuning (SFT) thay đổi model thông qua các ví dụ đầu vào–đầu ra.
-- Chuẩn bị dữ liệu hội thoại, template và loss mask đúng với mục tiêu học.
-- Giải thích full fine-tuning, parameter-efficient fine-tuning (PEFT), LoRA và QLoRA.
-- Đo cả phần cải thiện ở nhiệm vụ đích lẫn suy giảm ở các nhiệm vụ cần giữ.
+- Explain how SFT targets, serialization, and loss masks determine the behavior being optimized.
+- Compare full fine-tuning, LoRA, and QLoRA in terms of update constraints, memory use, and deployment implications.
+- Design a bounded adaptation comparison that distinguishes data, objective, optimization, and parameterization effects.
+- Assess specialization gains, retained capabilities, and cost using actual runs or attributable experimental artifacts.
 
-## Checklist nội dung
+## Content checklist
 
-- [ ] Giải thích khi nào nên thử prompt, bổ sung ngữ cảnh, SFT hoặc continued pretraining.
-- [ ] Biên soạn cách chọn base/instruct model dựa trên năng lực, giấy phép và tài nguyên thực tế.
-- [ ] Hướng dẫn chuẩn hóa dữ liệu instruction/chat, kiểm tra đáp án và tách tập theo nguồn hoặc nhóm.
-- [ ] Giải thích chat template, role tokens, EOS, truncation, packing và loss mask theo mục tiêu huấn luyện.
-- [ ] Trình bày full fine-tuning và PEFT; giải thích LoRA qua cập nhật hạng thấp và các tham số rank/scale/target modules.
-- [ ] Giải thích QLoRA ở mức thành phần: base weight lượng tử hóa, adapter học được và các nguồn sử dụng bộ nhớ.
-- [ ] Hướng dẫn chọn learning rate, batch hiệu dụng, số bước, gradient accumulation và checkpoint theo development.
-- [ ] Soạn quy trình phát hiện overfitting, lỗi định dạng, học đáp án nhiễu và suy giảm năng lực ngoài miền.
-- [ ] Hướng dẫn nạp/ghép adapter phù hợp, lưu revision và so sánh trước–sau bằng evaluation protocol cố định.
+- [ ] Connect continued pretraining, task SFT, and instruction SFT to their data distributions, target positions, and intended adaptation.
+- [ ] Analyze prompt/completion and conversation objectives, assistant-only versus broader loss masks, EOS handling, truncation, and packing boundaries.
+- [ ] Explain adaptation as a change in the model's conditional distribution and distinguish useful specialization from memorization or capability regression.
+- [ ] Describe LoRA's frozen base and constrained trainable updates, including rank, scaling, target modules, and their interaction with the task.
+- [ ] Explain QLoRA's quantized frozen base and trainable adapters; distinguish parameter savings from activation memory and total training resources.
+- [ ] Compare full updates and adapters, including mergeability, base-revision compatibility, precision, and potential serving overhead.
+- [ ] Design ablations for one adaptation choice while documenting shared data, token exposure, optimization settings, and tuning budget.
+- [ ] Interpret loss curves, checkpoints, in-domain results, out-of-domain retention, and calibration changes without treating lower SFT loss as sufficient evidence.
+- [ ] Prepare matched before/after artifacts with example-level errors, resource measurements, and the limits of small-run conclusions.
 
-## Thực hành đề xuất
+## Proposed lab
 
-### Lab: fine-tune cho một nhiệm vụ có đầu ra kiểm tra được
+### Compare adaptation choices on a domain capability
 
-Chọn một nhiệm vụ hẹp, chẳng hạn trích xuất thông tin thành JSON với schema rõ ràng. Dùng dữ liệu hợp lệ có nhãn được kiểm tra và các nhóm train/development/test tách biệt.
+**Research question:** How does one adaptation choice change domain-specific capability and retained general capability at a specified training budget?
 
-Đánh giá model ban đầu bằng một prompt có hướng dẫn hợp lý. Sau đó fine-tune bằng LoRA trên cùng mục tiêu; QLoRA là lựa chọn bổ sung khi cấu hình và phần cứng đã được xác nhận hỗ trợ.
+**Hypothesis:** Choose one comparison, such as two LoRA target-module/rank settings or LoRA versus full fine-tuning when feasible. Predict a task-specific benefit and a possible failure; do not assume that more trainable parameters or a larger rank must win.
 
-Giữ thêm một bộ kiểm tra nhỏ cho những năng lực cần bảo toàn. Không chọn checkpoint bằng tập test cuối cùng và không suy chất lượng từ training loss.
+**Controls:** Include the unchanged base as a reference. For the main adaptation comparison, fix the training examples, serialization, loss-mask policy, consumed-token budget, and evaluation protocol. Match optimization and tuning budgets where justified and report any unavoidable differences.
 
-**Sản phẩm cần nộp:**
+**Learner analysis:**
 
-- Data card, mẫu hội thoại sau template và hình hoặc bảng thể hiện vị trí tính loss.
-- Config huấn luyện, revision của base/tokenizer, adapter và hướng dẫn nạp lại.
-- Báo cáo trước–sau về chất lượng nhiệm vụ, tỷ lệ hợp lệ của định dạng và năng lực cần giữ.
-- Ghi nhận số tham số được học, tài nguyên đo được và các hạn chế của thí nghiệm.
+- Select a domain task with independently checkable outputs and a separate retention suite; justify the adaptation variable being tested.
+- Inspect serialized examples and marked target regions to determine which behavior each objective rewards.
+- Explain observed improvements and regressions, distinguishing objective or data effects from the parameterization claim.
 
-**Kiểm tra chấp nhận:**
+**Agent execution:**
 
-- Kiểm thủ công các token/labels của ít nhất một ví dụ ngắn, một ví dụ bị cắt và một ví dụ nhiều lượt.
-- Xác nhận đúng nhóm tham số đang được cập nhật; phân biệt tham số tổng với tham số trainable.
-- Adapter nạp lại với đúng base revision cho kết quả phù hợp với lần đánh giá đã lưu.
-- Báo cáo riêng lỗi nội dung và lỗi schema; không coi JSON hợp lệ là đáp án đúng.
+- Prepare and run the bounded adaptation configurations, or assemble clearly attributed matched-run artifacts if fresh training is impractical.
+- Record base/tokenizer revisions, trainable modules, target masks, optimization settings, token exposure, checkpoint selection, and resource use.
+- Evaluate the base and adapted checkpoints under the frozen protocol, preserving predictions and verifying adapter/base compatibility.
 
-Kết quả không cải thiện vẫn được chấp nhận nếu pipeline đúng và phân tích được nguyên nhân. Mục tiêu học là ra quyết định bằng dữ liệu.
+**Artifacts to verify:**
 
-## Câu hỏi tự kiểm tra
+- An adaptation hypothesis and controlled-comparison matrix with an unchanged-base reference.
+- Serialized training examples, target-region visualizations, data provenance, and consumed-token records.
+- Training summaries, checkpoint provenance, model/adapter configurations, and memory/runtime measurements.
+- Paired in-domain and retention results, error examples, and a claim ledger identifying untested mechanisms or confounders.
 
-### 1. Vì sao loss mask và chat template có thể làm hỏng một lần SFT?
+**Acceptance criteria:**
 
-**Gợi ý kiểm tra:** Chúng quyết định chuỗi model nhìn thấy và vị trí tạo gradient. Sai role, EOS, truncation hoặc vùng tính loss có thể khiến model học mục tiêu khác điều ta định dạy.
+- The selected targets and masks correspond to the intended adaptation, including truncated and multi-turn cases.
+- Claims about LoRA, QLoRA, or full fine-tuning are limited to the controlled comparison; different recipes are not treated as an isolated parameterization effect.
+- Target improvements are reported alongside retention, uncertainty, and resource costs; checkpoints are selected without using final test outcomes.
+- Reviewed artifacts are attributed, reproduced runs are identified, and missing evidence is not replaced by expected results.
 
-### 2. LoRA giảm số tham số học được, vậy có thể suy ngay mức VRAM từ con số đó không?
+**Experiment specification for an implementation agent:**
 
-**Gợi ý kiểm tra:** Không. Bộ nhớ còn chứa base weights, activations, gradients, optimizer state và phần tạm của phép tính; context length và batch cũng ảnh hưởng.
+```text
+Prepare the specified bounded adaptation comparison and an unchanged-base reference.
+Keep data, serialization, loss-mask policy, token exposure, and evaluation controlled.
+Record update targets, rank/precision choices, optimization settings, tuning budget, and revisions.
+Show representative target masks before training and preserve checkpoint-selection evidence.
+Return paired task/retention predictions, loss summaries, resource measurements, and failure cases.
+If using existing artifacts, attribute their origin and disclose unmatched conditions.
+```
 
-### 3. Điểm nhiệm vụ đích tăng nhưng một năng lực khác giảm: bạn xử lý thế nào?
+## Self-check questions
 
-**Gợi ý kiểm tra:** Xác nhận protocol và lỗi trước, rồi xem data mixture, learning rate, số bước và checkpoint. Quyết định dựa trên yêu cầu sử dụng và đánh đổi được đo, không chỉ một điểm tổng.
+### 1. Why can two SFT runs on the same examples optimize different behaviors?
 
-## Checklist hoàn thiện
+**Answer guidance:** Serialization, role boundaries, truncation, and loss masks determine which targets contribute to the objective. Identical source records do not guarantee identical training sequences or gradient signals.
 
-- [ ] Có ví dụ số hoặc sơ đồ cho cập nhật LoRA và ví dụ token/label cho SFT.
-- [ ] Lab chạy được trên cấu hình đã ghi, có đường thực hành nhỏ và hướng dẫn nạp adapter.
-- [ ] Có đáp án và rubric cho chất lượng dữ liệu, loss mask và đánh giá trước–sau.
-- [ ] Có các lỗi template, truncation, base revision và overfitting để người học chẩn đoán.
-- [ ] Nguồn, API, giấy phép model/dữ liệu và kết quả minh họa đã được kiểm tra.
+### 2. Why does LoRA's smaller trainable-parameter count not fully determine its memory or serving advantage?
 
-## Tài liệu tham khảo
+**Answer guidance:** Base weights, activations, optimizer state, precision, sequence length, and execution strategy also matter. Serving depends on whether and how updates are merged or applied, not just the trainable count.
 
-- [Hugging Face LLM Course](https://huggingface.co/learn/llm-course/chapter1/1): chương 11 về fine-tuning LLM và liên kết tới công cụ thực hành.
-- [Raschka — LLMs from Scratch](https://github.com/rasbt/LLMs-from-scratch): chương 7 về instruction fine-tuning và các phần bổ sung liên quan.
-- [Stanford CS336](https://cs336.stanford.edu/): phần Alignment và Reasoning RL nối SFT với các mục tiêu hậu huấn luyện.
+### 3. What is missing if LoRA beats a full-fine-tuning baseline trained with a different recipe?
 
-## Điều kiện hoàn thành
+**Answer guidance:** The result compares complete recipes unless data, exposure, objective, optimization, and tuning differences are controlled or explicitly analyzed. It does not isolate the low-rank update constraint by itself.
 
-- Bạn giải thích được dữ liệu nào tạo gradient và tham số nào đang được học.
-- Bạn tự chuẩn bị, chạy và nạp lại một adapter với cấu hình có thể kiểm tra.
-- Bạn đánh giá được cải thiện, hồi quy và giới hạn của một lần fine-tune.
+## Optional technical deep dive
 
-**Trước:** [07 · Đánh giá LLM](../07-evaluation/README.md) · **Tiếp:** [09 · Alignment và reasoning](../09-alignment-reasoning/README.md)
+- Derive the low-rank update and inspect gradient flow through frozen or quantized base weights.
+- Trace target tensors, masking, adapter merging, and optimizer-state memory in an implementation.
+- Implement a training loop or a broader rank/target-module sweep when a specific unanswered question justifies it.
+
+## Completion checklist
+
+- [ ] Include a worked adaptation comparison linking objective specification, update constraints, and measured outcomes.
+- [ ] Provide bounded run configurations or attributable artifacts with target masks, checkpoint provenance, and predictions.
+- [ ] Provide rubrics for mechanism claims, control quality, retention analysis, and resource tradeoffs.
+- [ ] Include serialization, masking, adapter-compatibility, overfitting, and recipe-confounding failures to diagnose.
+- [ ] Verify primary references, data/model licenses, versioned tooling, and result provenance; separate technical extensions.
+
+## References
+
+- [Hu et al. — LoRA](https://arxiv.org/abs/2106.09685): constrained low-rank adaptation and empirical comparisons.
+- [Dettmers et al. — QLoRA](https://arxiv.org/abs/2305.14314): adaptation through a quantized frozen base and its memory-design choices.
+- [Hugging Face TRL — SFT Trainer](https://huggingface.co/docs/trl/en/sft_trainer): dataset formats, target masking, and SFT implementation behavior; pin the experiment's version.
+
+References checked on **2026-11-15**.
+
+## Completion criteria
+
+- You can explain what an SFT objective trains and how its target specification can differ from the intended behavior.
+- You can justify an adaptation configuration using update constraints, available resources, and deployment requirements.
+- You can assess a bounded comparison without confusing specialization, recipe differences, and general improvements in model capability.
+
+**Previous:** [07 · Evaluation and experimental design](../07-evaluation/README.md) · **Next:** [09 · Alignment, reasoning and inference-time compute](../09-alignment-reasoning/README.md)

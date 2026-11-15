@@ -1,88 +1,103 @@
-# 13 · Đọc nghiên cứu và các hướng mở rộng
+# 13 · Research Frontiers and Claim Assessment
 
-[Trang chủ](../../README.md) · [Lộ trình LLM](../README.md)
+[Home](../../README.md) · [LLM Roadmap](../README.md)
 
-**Thời lượng dự kiến:** 12 giờ cho phần đọc, phân tích và tái lập nhỏ; các nhánh đào sâu là tùy chọn ngoài thời lượng này.
+**Estimated core time:** 8 hours for a focused claim assessment and experiment specification. Extended replication is optional.
 
-**Tiên quyết:** [Tự xây GPT nhỏ](../05-build-tiny-gpt/README.md), [Dữ liệu và pretraining](../06-data-pretraining/README.md), [Đánh giá mô hình](../07-evaluation/README.md). Học thêm [SFT và PEFT](../08-sft-peft/README.md), [Alignment và reasoning](../09-alignment-reasoning/README.md) nếu chọn paper thuộc các chủ đề này.
+**Prerequisites:** [Transformer Architecture](../02-transformer-architecture/README.md), [Training Dynamics and Scaling](../04-training-dynamics-scaling/README.md), [Model Evaluation](../07-evaluation/README.md). Add [SFT and PEFT](../08-sft-peft/README.md) or [Alignment and Reasoning](../09-alignment-reasoning/README.md) for claims in those areas.
 
-**Trạng thái:** Khung nội dung; các mục chưa đánh dấu đang chờ biên soạn hoặc kiểm tra.
+**Status:** Content scaffold; unchecked items are awaiting authoring or review.
 
-Các checkbox phản ánh độ sẵn sàng của nội dung dùng chung, không phải tiến độ học của từng người.
+Checkboxes track shared content readiness.
 
-## Mục tiêu
+## Learning objectives
 
-Sau mô-đun này, người học có thể:
+After this module, learners will be able to:
 
-- Tách câu hỏi nghiên cứu, tuyên bố, bằng chứng và phạm vi kết luận của một bài báo LLM.
-- Kiểm tra baseline, ngân sách tính toán, dữ liệu và các biến gây nhiễu trong phép so sánh.
-- Đề xuất ablation và thực hiện một tái lập nhỏ với giới hạn được mô tả rõ ràng.
-- Chọn một hướng đào sâu phù hợp từ MoE, ngữ cảnh dài, đa phương thức, distillation hoặc huấn luyện phân tán.
+- Explain the architectural mechanism and systems tradeoff in a selected MoE, long-context, or multimodal research direction.
+- Assess LLM claims against data exposure, active/resident parameters, training compute, and inference budgets.
+- Identify whether reported experiments distinguish the claimed mechanism from plausible competing explanations.
+- Specify a discriminating follow-up experiment and bound what a smaller-scale result could establish.
 
-## Checklist nội dung
+## Content checklist
 
-- [ ] Soạn mẫu đọc bài báo gồm vấn đề, giả thuyết, tuyên bố chính, thiết lập thực nghiệm, bằng chứng và điều kiện áp dụng.
-- [ ] Viết hướng dẫn truy nguồn số liệu về bảng, hình hoặc artifact gốc; phân biệt kết quả tác giả báo cáo với kết quả tự tái lập.
-- [ ] Bổ sung bảng kiểm baseline về dữ liệu, tham số, token huấn luyện, compute, tuning và ngân sách suy luận; ghi rõ trường hợp không thể cân bằng mọi yếu tố.
-- [ ] Minh họa biến gây nhiễu do dữ liệu, contamination, lựa chọn checkpoint và khác biệt giao thức đánh giá.
-- [ ] Thiết kế ví dụ ablation có câu hỏi cụ thể, đối chứng và yếu tố giữ cố định; nêu khi nào loại một thành phần làm thay đổi nhiều biến cùng lúc.
-- [ ] Soạn protocol tái lập nhỏ có phiên bản, seed, ngân sách, tiêu chí so sánh và cách báo cáo kết quả không khớp.
-- [ ] Viết bản đồ tổng quan MoE và ngữ cảnh dài dưới dạng nhánh tùy chọn, chỉ rõ câu hỏi, kiến thức bổ sung và chi phí thí nghiệm.
-- [ ] Viết bản đồ tổng quan đa phương thức, distillation và huấn luyện phân tán dưới dạng nhánh tùy chọn; thêm nguồn sơ cấp theo từng hướng trước khi mở rộng bài học.
-- [ ] Tạo mẫu ghi chú nghiên cứu tách điều đã biết, suy luận, điểm chưa chắc và thí nghiệm tiếp theo có thể bác bỏ giả thuyết.
+- [ ] Develop a MoE comparison covering active versus total parameters, expert routing, load balance, memory residency, and communication.
+- [ ] Develop a long-context comparison separating accepted length, position effects, evidence retrieval, multi-document reasoning, and inference cost.
+- [ ] Develop a multimodal comparison covering encoders, projection/cross-attention, visual token budgets, grounding, and language-prior shortcuts.
+- [ ] Normalize claim comparisons by training data/tokens, compute, tuning, inference budget, and benchmark protocol; mark undisclosed quantities.
+- [ ] Analyze LLM-specific confounders including contamination, model-family changes, tokenizer differences, and extra test-time computation.
+- [ ] Connect architectural claims to ablations and competing explanations, including interactions that make component removal ambiguous.
+- [ ] Prepare a focused test specification with predictions, matched controls, measurements, feasibility limits, and falsifying observations.
+- [ ] Distinguish paper-reported evidence, extracted source data, scaling assumptions, and actually executed replications.
+- [ ] Map optional extensions in distillation, distributed training, and frontier-specific mathematics without making every branch mandatory.
 
-## Thực hành đề xuất
+## Proposed lab
 
-### Bài toán
+Assess one frontier claim; use effective long-context utilization as the default case, or specify an equally controlled MoE or multimodal study.
 
-Chọn một bài báo có artifact công khai và một tuyên bố có thể khảo sát ở quy mô nhỏ trong ngân sách hiện có.
-Lập bảng đối chiếu thiết lập gốc với thiết lập thực hiện, sau đó tái lập một phép so sánh hoặc một ablation hẹp.
+**Responsibilities:** The learner owns the claim, normalization, and discriminating test; the implementation agent extracts evidence and can execute a selected bounded extension.
 
-### Sản phẩm bàn giao
+### Experiment specification for an implementation agent
 
-- Phiếu đọc bài báo với liên kết đến phiên bản bài, bảng/hình liên quan, mã nguồn và cấu hình nếu có.
-- Bảng baseline cùng ngân sách dữ liệu, huấn luyện, tuning và suy luận; ghi các mục không được tác giả công bố.
-- Protocol, artifact của lần chạy và báo cáo chênh lệch giữa thiết lập gốc với thiết lập thu nhỏ.
-- Một đề xuất nghiên cứu tiếp theo gồm giả thuyết, đối chứng, phép đo và kết quả nào sẽ bác bỏ giả thuyết.
+| Element | Specification |
+| --- | --- |
+| Question | Does a longer supported context window translate into more reliable use of the same evidence under distractor load? |
+| Prediction | If position sensitivity limits utilization, moving evidence into the middle should hurt more as distractor length grows; a flat result weakens that explanation for the tested model. |
+| Intervention | Specify paired evidence-position and distractor-length conditions with unchanged question and supporting facts. |
+| Controls | Fix checkpoint, evidence content, decoding, answer budget, scoring, and task difficulty; record supported lengths and any truncation. |
+| Execution | Audit the selected paper's actual conditions, compare relevant baselines, and prepare the paired test; execution beyond the source assessment is an optional extension. |
 
-### Tiêu chí nghiệm thu
+### Inspectable artifacts
 
-- Mọi tuyên bố được gắn với nguồn hoặc được đánh dấu là suy luận, câu hỏi mở hay quan sát từ lần chạy của người học.
-- Báo cáo nêu rõ biến kiểm soát, biến gây nhiễu còn lại và giới hạn của một lần chạy hoặc một mô hình nhỏ.
-- Tái lập nhỏ không được dùng để khẳng định đã xác nhận toàn bộ bài báo; kết quả không khớp phải được giữ lại và phân tích.
-- Có tối thiểu một phép so sánh hoặc ablation thực hiện được; các nhánh đào sâu không trở thành điều kiện bắt buộc của mô-đun.
+- A claim/mechanism map tied to exact paper versions, figures, tables, and available artifacts.
+- A comparison sheet for data exposure, architecture, active/resident capacity, training compute, and inference conditions where relevant.
+- An assessment of what the evidence rules out, what remains confounded, and whether the result transfers to the target workload.
+- A feasible experiment specification; any optional execution adds configurations, raw outputs, measurements, and deviations from the source setup.
 
-## Câu hỏi tự kiểm tra
+### Acceptance criteria
 
-1. Nếu phương pháp mới tốt hơn baseline nhưng dùng nhiều dữ liệu và compute hơn, có thể kết luận được điều gì?
+- Explain the selected mechanism and its resource tradeoff using primary evidence, with missing comparison quantities explicitly identified.
+- Identify a competing explanation and a control that could distinguish it; avoid equating a favorable benchmark result with a validated mechanism.
+- Make the prediction falsifiable and state the limits of a small model, reduced scale, or narrower task distribution.
+- A source-grounded assessment and executable test specification complete the core; report replication results only when the specified run occurred.
 
-   **Gợi ý:** Tách hiệu quả của hệ thống hoàn chỉnh khỏi đóng góp riêng của phương pháp; xác định phép đối chứng còn thiếu.
+## Self-check questions
 
-2. Khi bỏ một thành phần làm hiệu năng giảm, vì sao chưa đủ để giải thích cơ chế của thành phần đó?
+1. Why can an MoE model with fewer active parameters still have poor serving latency or require substantial memory?
 
-   **Gợi ý:** Xét thay đổi ngân sách, tối ưu hóa, tương tác giữa thành phần và khả năng đối chứng thay thế.
+   **Hint:** Separate active compute from resident weights, routing balance, communication, batching, and runtime support.
 
-3. Một kết quả tái lập nhỏ không khớp bài báo nên được diễn giải và báo cáo như thế nào?
+2. Why is successful needle retrieval insufficient evidence for robust long-context reasoning?
 
-   **Gợi ý:** Kiểm tra sai khác thiết lập, biến ngẫu nhiên và phạm vi quy mô trước khi quy nguyên nhân.
+   **Hint:** Distinguish locating evidence from combining it, handling distractors, and supporting multi-document conclusions.
 
-## Checklist hoàn thiện
+3. Which controls help distinguish a multimodal model's visual grounding from language priors or additional training exposure?
 
-- [ ] Thêm một phiếu đọc mẫu có nguồn và một bảng so sánh công bằng; đánh dấu rõ phần minh họa hoặc dữ liệu thực.
-- [ ] Chạy lại protocol tái lập nhỏ và kiểm tra khả năng truy vết từ báo cáo về cấu hình, artifact.
-- [ ] Viết đáp án gợi ý cho câu hỏi tự kiểm tra và rubric đánh giá chất lượng phân tích bài báo.
-- [ ] Bổ sung lỗi thường gặp: baseline yếu, lệch compute, chọn kết quả thuận lợi và suy rộng từ thí nghiệm nhỏ.
-- [ ] Xác minh nguồn sơ cấp, phiên bản bài và artifact; nhờ người khác rà soát việc kết luận có vượt bằng chứng hay không.
+   **Hint:** Consider matched text-only conditions, controlled visual perturbations, data exposure, and task-specific evidence requirements.
 
-## Tài liệu tham khảo
+## Completion checklist
 
-- [Stanford CS336: Language Modeling from Scratch](https://cs336.stanford.edu/) — nền tảng để xác định kiến thức và thiết lập cần kiểm tra khi đọc nghiên cứu LLM.
-- [Google Research: Deep Learning Tuning Playbook](https://github.com/google-research/tuning_playbook) — tham khảo thiết kế thí nghiệm, tuning và cách diễn giải phép so sánh.
-- [EleutherAI Language Model Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness) — tham khảo cấu hình và artifact phục vụ đánh giá có thể tái lập.
+- [ ] Add a mechanism-focused example in each selected branch with explicit comparison quantities and source locations.
+- [ ] Validate the test specification and source extraction; retain execution artifacts for any included replication example.
+- [ ] Write answer guidance and rubrics for LLM-specific tradeoffs, competing explanations, and discriminating controls.
+- [ ] Document pitfalls including active/total parameter confusion, window-size claims, unmatched data, extra inference compute, and overgeneralization.
+- [ ] Verify primary source versions and ask another contributor to challenge the claim-to-evidence reasoning.
 
-## Điều kiện hoàn thành
+## Optional technical deep dive
 
-Người học hoàn thành một phân tích có truy nguồn và một tái lập nhỏ hoặc ablation hẹp, chỉ ra được yếu tố chưa kiểm soát.
-Người học chọn được câu hỏi tiếp theo có thể kiểm chứng; không cần hoàn thành mọi nhánh MoE, ngữ cảnh dài, đa phương thức, distillation và huấn luyện phân tán.
+- Execute a narrow replication or ablation, including uncertainty analysis and sensitivity to scale or task distribution.
+- Investigate routing objectives, positional extrapolation, visual token compression, or cross-modal fusion in the selected branch.
+- Explore distillation, distributed training, tensor implementations, or formal derivations required by a concrete research question.
 
-**Trước:** [12 · Tool use và agents](../12-tool-use-agents/README.md) · **Tiếp:** [14 · Capstone](../14-capstone/README.md)
+## References
+
+- [Switch Transformers](https://arxiv.org/abs/2101.03961) — sparse routing and capacity/compute/system tradeoffs.
+- [Lost in the Middle](https://arxiv.org/abs/2307.03172) — controlled evidence-position studies for long-context use.
+- [Flamingo](https://arxiv.org/abs/2204.14198) — a representative visual-language architecture and evaluation design.
+
+## Completion criteria
+
+Deliver a technically specific frontier claim assessment, a normalized comparison, and an experiment that separates the proposed mechanism from an alternative.
+Choose one branch for depth; conclusions must remain within the available evidence and the test's scale.
+
+**Previous:** [12 · Tool Use and Agent Architectures](../12-tool-use-agents/README.md) · **Next:** [14 · Capstone](../14-capstone/README.md)

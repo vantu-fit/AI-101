@@ -1,92 +1,120 @@
-# 06 · Dữ liệu và pretraining
+# 06 · Data pipelines and pretraining design
 
-[Trang chủ](../../README.md) · [Lộ trình LLM](../README.md)
+[Home](../../README.md) · [LLM roadmap](../README.md)
 
-**Thời lượng dự kiến:** 22 giờ học và thực hành; chưa bao gồm các lần chạy máy dài.
+**Estimated core time:** 12 hours. Optional technical extensions and long training runs are outside this estimate.
 
-**Học trước:** [05 · Tự xây một GPT nhỏ](../05-build-tiny-gpt/README.md).
+**Prerequisites:** [04 · Training dynamics and scaling](../04-training-dynamics-scaling/README.md).
 
-**Trạng thái:** Khung nội dung; các mục chưa đánh dấu đang chờ biên soạn hoặc kiểm tra.
+**Status:** Content scaffold; unchecked items still need to be written or reviewed.
 
-Các checkbox theo dõi việc biên soạn nội dung chung, không biểu thị người học đã hoàn thành module.
+Checkboxes track shared content readiness. The focus is on data interventions, training exposure, and the evidence needed to justify a pretraining design choice.
 
-## Mục tiêu
+## Learning objectives
 
-- Hiểu dữ liệu nào trở thành tín hiệu huấn luyện và vì sao nhiều dữ liệu hơn chưa đủ để kết luận tốt hơn.
-- Thiết kế pipeline xử lý dữ liệu có nguồn gốc, thống kê và khả năng kiểm tra lại.
-- Phân biệt pretraining từ đầu, continued pretraining và instruction fine-tuning.
-- So sánh thay đổi dữ liệu bằng một thí nghiệm có ngân sách và điều kiện rõ ràng.
+- Analyze curation, deduplication, mixture proportions, and sampling as interventions on the training distribution.
+- Design a data comparison that accounts for token budgets, repetition, provenance, and contamination.
+- Interpret dataset audits and model evaluations as different kinds of evidence.
+- Decide which data intervention to test next and state the limits of transferring results across model scales or domains.
 
-## Checklist nội dung
+## Content checklist
 
-- [ ] Biên soạn vòng đời corpus: thu thập, quyền sử dụng, trích xuất văn bản, chuẩn hóa và lưu phiên bản.
-- [ ] Giải thích chất lượng, độ phủ miền, ngôn ngữ, độ đa dạng và sự phù hợp với mục tiêu sử dụng.
-- [ ] Viết hướng dẫn lọc chất lượng, exact/near deduplication và kiểm tra nội dung bị loại nhầm.
-- [ ] Mô tả chia tập theo nhóm tài liệu/nguồn và kiểm tra giao nhau, bao gồm contamination với bộ đánh giá.
-- [ ] Giải thích tokenizer, packing, document boundary, context length và ngân sách tính bằng token.
-- [ ] Soạn bài về data mixture, tỷ lệ lấy mẫu, số lần lặp dữ liệu và thay đổi phân phối theo thời gian.
-- [ ] Trình bày mục tiêu pretraining, continued pretraining và khác biệt so với SFT ở dữ liệu và loss mask.
-- [ ] Giới thiệu quan hệ giữa số tham số, token và compute; nêu phạm vi áp dụng của scaling laws.
-- [ ] Xây quy trình ablation dữ liệu: baseline, biến thay đổi, ngân sách cố định và evaluation ngoài train.
+- [ ] Map an operational pipeline from source collection and extraction to filtering, deduplication, mixing, tokenization, and versioned training shards.
+- [ ] Analyze quality filters as distribution-changing decisions, including domain/language coverage and useful examples removed by mistake.
+- [ ] Compare exact, near-duplicate, and semantic overlap concepts; explain the limits of practical overlap detectors.
+- [ ] Explain data mixtures, sampling proportions, repeated exposure, and why equal document counts do not imply equal training conditions.
+- [ ] Examine tokenizer choice, document boundaries, packing, context length, and the distinction between available and consumed tokens.
+- [ ] Define provenance, usage-rights records, contamination checks, and grouping rules for related sources and evaluation examples.
+- [ ] Design matched-budget data ablations, stating which quantities are controlled and which distribution changes are part of the intervention.
+- [ ] Interpret domain-specific loss, downstream capability, and regression results without substituting a data-cleanliness metric for model evidence.
+- [ ] Use FineWeb and DoReMi as case studies in empirical data design, including the limits of proxy models and extrapolation.
 
-## Thực hành đề xuất
+## Proposed lab
 
-### Lab: dữ liệu sạch hơn có giúp mô hình nhỏ không?
+### Test one data intervention under an explicit training budget
 
-Chuẩn bị một corpus nhỏ với các tài liệu có nguồn gốc rõ ràng. Tạo hai phiên bản: xử lý tối thiểu và thêm một bước lọc hoặc deduplication được mô tả cụ thể.
+**Research question:** Does a selected filter, deduplication rule, or mixture adjustment improve the targeted capabilities at a defined training budget, and what does it cost in coverage or retained capability?
 
-Giữ cùng kiến trúc, tokenizer, cấu hình tối ưu và ngân sách token huấn luyện cho phép so sánh chính. Ghi lại số tài liệu, token còn lại, mức lặp dữ liệu và thời gian chạy thực tế.
+**Hypothesis:** Specify the error family or domain expected to benefit, the proposed mechanism, and a possible adverse effect. A reduction in duplicates or higher filter scores is an intermediate observation, not the final model-quality claim.
 
-Dùng cùng tập validation độc lập. Nếu tập sạch không đủ token mà phải lặp lại, phải ghi nhận điều đó vì đây cũng là một thay đổi của phân phối huấn luyện.
+**Controls:** Use the same model initialization or base checkpoint, tokenizer, optimization recipe, training-token budget, and evaluation suite for a bounded pair of runs where feasible. Record repetition, realized domain exposure, and any controls that cannot be matched.
 
-**Sản phẩm cần nộp:**
+**Learner analysis:**
 
-- Data card: nguồn, quyền sử dụng, phạm vi, các bước xử lý và giới hạn đã biết.
-- Bảng thống kê trước/sau, cùng ví dụ nội dung được giữ và bị loại.
-- Hai cấu hình chạy, learning curves và báo cáo đánh giá trên cùng bộ dữ liệu.
-- Một kết luận có điều kiện: kết quả nào được đo, điều gì còn chưa thể suy rộng.
+- Choose one intervention and inspect its effect on data coverage before committing compute.
+- Audit retained and removed examples, near-duplicate matches, and potential overlap with evaluation sources.
+- Interpret domain-level and downstream results together, separating direct observations from a hypothesized mechanism.
 
-**Kiểm tra chấp nhận:**
+**Agent execution:**
 
-- Có kiểm tra giao nhau giữa train và validation/test ở mức tài liệu hoặc nhóm phù hợp.
-- Có thể tái tạo hai phiên bản dữ liệu bằng config và thông tin nguồn đã ghi.
-- Không chọn quy tắc lọc bằng cách liên tục tối ưu trên tập test cuối cùng.
-- Báo cáo phân biệt tác động quan sát với giả thuyết về nguyên nhân; kết quả âm vẫn hợp lệ.
+- Implement the versioned data pipeline and produce audit samples, mixture statistics, overlap reports, and consumed-token records.
+- Execute a bounded comparison or assemble attributable matched-run artifacts for review; mark remaining mismatches and never present unexecuted runs as completed.
 
-Đây là lab học cách thiết kế thí nghiệm. Một mô hình nhỏ và một tập đánh giá chưa đủ để kết luận một quy tắc dữ liệu tốt cho mọi LLM.
+**Artifacts to verify:**
 
-## Câu hỏi tự kiểm tra
+- A data manifest with provenance, usage rights, processing decisions, versions, and grouping rules.
+- Before-and-after coverage, duplication, mixture, and token-exposure reports with representative examples.
+- Paired run configurations and evaluation outputs, including domain-specific results and capability regressions.
+- A claim ledger distinguishing data-only findings, measured model effects, and untested transfer to other scales or distributions.
 
-### 1. Tại sao xóa nhiều dữ liệu trùng hơn chưa chắc luôn làm model tốt hơn?
+**Acceptance criteria:**
 
-**Gợi ý kiểm tra:** Xem dữ liệu bị mất thuộc miền nào, độ đa dạng còn lại và ngân sách token. Deduplication có thể thay đổi phân phối; cần đo thay vì suy từ số lượng bị xóa.
+- The intervention is reproducible and its intended distribution change is distinguished from uncontrolled changes.
+- Contamination checks report detector scope and limitations rather than claiming that a clean scan proves absence of overlap.
+- Model-improvement claims are supported by actual runs or clearly attributed artifacts; a data-only audit supports only data-level conclusions.
+- The recommendation accounts for lost coverage, repetition, budget differences, and negative or inconclusive results.
 
-### 2. Hai tập có cùng số tài liệu có phải có cùng ngân sách huấn luyện không?
+**Experiment specification for an implementation agent:**
 
-**Gợi ý kiểm tra:** Không. Độ dài token, tokenizer, packing, số epoch và phần token thực sự tham gia loss đều ảnh hưởng lượng học và compute.
+```text
+Implement the specified single data intervention and preserve a versioned control corpus.
+Audit provenance, coverage, duplicate groups, evaluation overlap, and token exposure.
+Prepare matched training/evaluation configurations and disclose unmatched quantities.
+Run within the agreed budget or provide attributable existing artifacts for review.
+Return domain-level results, regressions, retained/removed examples, and a claim-to-evidence table.
+Keep data-only findings separate from measured model improvements.
+```
 
-### 3. Khi nào bạn chọn continued pretraining thay vì SFT?
+## Self-check questions
 
-**Gợi ý kiểm tra:** Xác định mục tiêu là thích nghi với phân phối văn bản hay học hành vi trả lời theo hướng dẫn. Cần đối chiếu dữ liệu, phép đo và nguy cơ suy giảm năng lực khác; không quyết định chỉ từ tên kỹ thuật.
+### 1. Why can an apparently stronger quality filter reduce downstream capability?
 
-## Checklist hoàn thiện
+**Answer guidance:** The filter can remove useful domains, languages, or difficult examples and change mixture proportions or repeated exposure. Inspect the realized distribution and task results rather than assuming its quality score matches the downstream objective.
 
-- [ ] Có ví dụ xuyên suốt về một tài liệu đi qua pipeline và các quyết định xử lý.
-- [ ] Lab có dữ liệu dùng hợp lệ, cấu hình nhỏ và hướng dẫn tái tạo.
-- [ ] Có rubric cho data card, kiểm tra giao nhau và so sánh ngân sách.
-- [ ] Có ví dụ lọc sai, trùng xuyên tập và thay đổi data mixture ngoài ý muốn.
-- [ ] Tài liệu tham khảo, quyền sử dụng và các kết quả minh họa đã được kiểm tra.
+### 2. Why is fixing training tokens helpful but insufficient for a perfectly controlled data comparison?
 
-## Tài liệu tham khảo
+**Answer guidance:** Sequence lengths, packing, repetitions, domain exposure, and optimization dynamics may still differ. State which differences are intended parts of the intervention and which remain confounders.
 
-- [FineWeb — báo cáo kỹ thuật của nhóm tác giả](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/index.html): ví dụ thực nghiệm về filtering và deduplication.
-- [Stanford CS336](https://cs336.stanford.edu/): các phần Data và Scaling để học cách nối corpus với compute và đánh giá.
-- [Hugging Face LLM Course](https://huggingface.co/learn/llm-course/chapter1/1): chương 10 về chuẩn bị dữ liệu chất lượng.
+### 3. When does a successful small-model data experiment justify changing a larger-model training mixture?
 
-## Điều kiện hoàn thành
+**Answer guidance:** It provides evidence for a candidate intervention, not guaranteed transfer. Consider scale, token budget, optimization, evaluation coverage, and the cost of a confirmation run before making the larger commitment.
 
-- Bạn giải thích được vì sao mỗi bước xử lý tồn tại và dữ liệu nào có thể bị loại nhầm.
-- Bạn thiết kế được một so sánh dữ liệu có baseline, ngân sách và phép đo rõ ràng.
-- Bạn nhận ra khi nào kết quả còn bị nhiễu bởi tokenizer, dữ liệu lặp hoặc contamination.
+## Optional technical deep dive
 
-**Trước:** [05 · Tự xây một GPT nhỏ](../05-build-tiny-gpt/README.md) · **Tiếp:** [07 · Đánh giá LLM](../07-evaluation/README.md)
+- Implement or inspect MinHash-based deduplication, document grouping, and token-packing logic.
+- Study data-mixture objectives, proxy-model assumptions, and compute-sensitive experimental designs mathematically.
+- Reproduce a limited filtering or mixture ablation with additional seeds or scales when the remaining uncertainty justifies it.
+
+## Completion checklist
+
+- [ ] Include a worked data intervention with a distribution audit and clearly scoped model evidence.
+- [ ] Provide bounded run specifications or attributable comparison artifacts with explicit control limitations.
+- [ ] Provide rubrics for provenance, contamination checks, budget matching, and claim-to-evidence reasoning.
+- [ ] Include harmful filtering, residual overlap, repetition, and proxy-transfer failures to diagnose.
+- [ ] Verify primary sources, data rights, versions, and result provenance; label technical extensions separately.
+
+## References
+
+- [FineWeb — technical report by the authors](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/index.html): empirical filtering and deduplication decisions and their tradeoffs.
+- [Xie et al. — DoReMi](https://arxiv.org/abs/2305.10429): data-mixture optimization through a proxy model and subsequent training experiments.
+- [Stanford CS336](https://cs336.stanford.edu/): data, scaling, and pretraining systems; implementation assignments are optional extensions.
+
+References checked on **2026-11-15**.
+
+## Completion criteria
+
+- You can specify a data intervention, its intended distribution change, and the controls needed to evaluate it.
+- You can audit contamination, provenance, coverage, and consumed-token evidence in a comparison.
+- You can recommend a next data experiment while distinguishing observed model effects from assumptions about transfer.
+
+**Previous:** [05 · Decoding, uncertainty and model behavior](../05-decoding-model-behavior/README.md) · **Next:** [07 · Evaluation and experimental design](../07-evaluation/README.md)

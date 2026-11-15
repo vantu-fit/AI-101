@@ -1,86 +1,101 @@
-# 12 · Sử dụng công cụ và tác tử
+# 12 · Tool Use and Agent Architectures
 
-[Trang chủ](../../README.md) · [Lộ trình LLM](../README.md)
+[Home](../../README.md) · [LLM Roadmap](../README.md)
 
-**Thời lượng dự kiến:** 14 giờ.
+**Estimated core time:** 10 hours. Optional technical extensions are outside this budget.
 
-**Tiên quyết:** [Đánh giá mô hình](../07-evaluation/README.md), [Retrieval và RAG](../11-retrieval-rag/README.md). Khuyến nghị học thêm [Inference và serving](../10-inference-serving/README.md) nếu tự phục vụ mô hình.
+**Prerequisites:** [Model Evaluation](../07-evaluation/README.md), [Retrieval Architectures and RAG](../11-retrieval-rag/README.md). Add [Inference Systems and Serving](../10-inference-serving/README.md) when serving models locally.
 
-**Trạng thái:** Khung nội dung; các mục chưa đánh dấu đang chờ biên soạn hoặc kiểm tra.
+**Status:** Content scaffold; unchecked items are awaiting authoring or review.
 
-Các checkbox phản ánh độ sẵn sàng của nội dung dùng chung, không phải tiến độ học của từng người.
+Checkboxes track shared content readiness.
 
-## Mục tiêu
+## Learning objectives
 
-Sau mô-đun này, người học có thể:
+After this module, learners will be able to:
 
-- Phân biệt đầu ra có cấu trúc, đề xuất gọi hàm và việc thực thi công cụ trong ứng dụng.
-- Thiết kế vòng điều khiển có trạng thái, điều kiện dừng và ngân sách thao tác rõ ràng.
-- Kiểm soát quyền công cụ, xử lý lỗi và nhận diện chỉ dẫn không đáng tin cậy trong dữ liệu bên ngoài.
-- Đánh giá tác tử theo kết quả nhiệm vụ và chi phí, dựa trên trace có thể kiểm tra.
+- Separate the model's action-selection policy from orchestration, execution, application state, and authority.
+- Design context and memory boundaries, tool contracts, and termination/reliability budgets.
+- Diagnose policy, state, tool, and recovery failures from observable action traces and outcomes.
+- Compare an adaptive agent architecture with a fixed workflow under matched resource constraints.
 
-## Checklist nội dung
+## Content checklist
 
-- [ ] Viết ví dụ schema cho đầu ra có cấu trúc và tham số hàm; tách hợp lệ về cú pháp khỏi đúng về ý nghĩa.
-- [ ] Minh họa luồng model đề xuất lời gọi, ứng dụng kiểm tra, thực thi công cụ và trả kết quả; chỉ rõ nơi quyền được thực thi.
-- [ ] Soạn sơ đồ trạng thái tối thiểu cho chọn hành động, gọi công cụ, quan sát và kết thúc; nêu giới hạn số bước, token và thời gian.
-- [ ] Thiết kế xử lý tham số sai, công cụ không tồn tại, timeout, lỗi tạm thời và kết quả thiếu; nêu giới hạn retry và nguy cơ lặp tác dụng phụ.
-- [ ] Bổ sung ví dụ prompt injection từ tài liệu hoặc đầu ra công cụ; xác định ranh giới giữa dữ liệu và chỉ dẫn được tin cậy.
-- [ ] Viết chính sách quyền tối thiểu, danh sách công cụ cho phép và điều kiện xác nhận với thao tác có tác dụng bên ngoài.
-- [ ] Định nghĩa trace gồm trạng thái, lời gọi, kết quả, lỗi và chi phí; bổ sung cách che thông tin nhạy cảm trước khi lưu hoặc chia sẻ.
-- [ ] Thiết kế bộ đánh giá kết quả nhiệm vụ, tuân thủ giới hạn, xử lý thất bại và hiệu quả; so sánh với một workflow cố định.
+- [ ] Distinguish model policy from the orchestrator's state transitions, validation, tool dispatch, and stopping rules.
+- [ ] Compare model-visible context, persisted memory, and authoritative application state; cover stale observations and lossy context compaction.
+- [ ] Specify tool contracts with schemas, preconditions, authorization, error semantics, and idempotency; separate valid syntax from valid actions.
+- [ ] Analyze budgets for model calls, tool calls, tokens, retries, and deadlines, including how failures accumulate across dependent steps.
+- [ ] Develop fault cases for malformed calls, timeouts, duplicate execution, missing results, and inconsistent state.
+- [ ] Explain trust boundaries around tool outputs, retrieved content, and stored memory; include prompt injection and permission enforcement.
+- [ ] Define traces of actions, state changes, results, and costs; distinguish emitted rationales from evidence about internal model computation.
+- [ ] Design a fixed-workflow versus adaptive-policy comparison with task-level outcomes, repeated trials, and explicit reliability criteria.
 
-## Thực hành đề xuất
+## Proposed lab
 
-### Bài toán
+Compare fixed retrieval orchestration with adaptive search/read decisions on single-source and multi-source document questions.
 
-Mở rộng hệ thống hỏi đáp tài liệu bằng hai công cụ chỉ đọc: tìm đoạn tài liệu và lấy nội dung theo mã đoạn.
-Tác tử phải quyết định khi nào cần thêm bằng chứng và kết thúc trong ngân sách đã định; dùng công cụ mô phỏng cho các ca lỗi.
+**Responsibilities:** The learner defines architecture, contracts, budgets, and hypotheses; the implementation agent builds both systems and executes normal and fault-injection trials.
 
-### Sản phẩm bàn giao
+### Experiment specification for an implementation agent
 
-- Đặc tả schema, quyền và hợp đồng đầu vào/đầu ra cho từng công cụ.
-- Vòng điều khiển hoặc sơ đồ trạng thái có điều kiện dừng, giới hạn retry và cách báo lỗi cho người dùng.
-- Bộ tình huống gồm yêu cầu bình thường, dữ liệu thiếu, lỗi công cụ và chỉ dẫn giả được chèn trong tài liệu.
-- Trace đã loại thông tin nhạy cảm, bảng kết quả nhiệm vụ và so sánh với workflow truy hồi cố định.
+| Element | Specification |
+| --- | --- |
+| Question | Does adaptive tool selection improve evidence-complete answers enough to justify its extra model calls and failure opportunities? |
+| Prediction | Benefits should concentrate on multi-source cases; single-source cases may gain little while incurring additional latency and cost. |
+| Intervention | Compare a fixed retrieve/read workflow with a bounded adaptive policy using the same read-only search and fetch tools. |
+| Controls | Match task sets, model version, corpus, tool interfaces, scoring, and maximum tool/token/time budgets; report actual consumption separately. |
+| Execution | Repeat trials under normal operation and specified timeout, missing-result, injected-instruction, and permission-denial conditions; retain all outcomes. |
 
-### Tiêu chí nghiệm thu
+### Inspectable artifacts
 
-- Ứng dụng kiểm tra schema và quyền trước khi gọi công cụ; tên hoặc tham số do mô hình sinh không tự mở rộng quyền.
-- Mỗi lượt chạy kết thúc bằng kết quả hoặc lỗi rõ ràng trong giới hạn bước, thời gian và retry đã đặt.
-- Có kiểm tra hành vi trước chỉ dẫn giả trong dữ liệu, với tiêu chí cụ thể; không xem vài ca vượt qua là bằng chứng bảo đảm an toàn tuyệt đối.
-- Đánh giá dựa trên hoàn thành nhiệm vụ, bằng chứng, số lần gọi, độ trễ và lỗi; không chỉ dựa trên trace có vẻ hợp lý.
+- Architecture/state diagrams, tool contracts, memory/context rules, and resource/retry limits.
+- Trial manifests and observable action traces containing tool arguments, results, state changes, errors, and stopping reasons.
+- Task outcomes stratified by question type and fault condition, with repeated-trial consistency and actual resource consumption.
+- A failure attribution report separating policy choices, orchestration defects, tool failures, and inadequate evidence.
 
-## Câu hỏi tự kiểm tra
+### Acceptance criteria
 
-1. Một lời gọi hàm đúng schema có thể vẫn gây sai ở những điểm nào, và thành phần nào phải ngăn việc đó?
+- The comparison uses matched limits and identifies actual cost differences; interpret results as evidence about the evaluated architecture and policy.
+- Verify contracts, permissions, termination, and retry behavior from observed normal and failure cases.
+- Score evidence-supported task outcomes and consistency across trials; plausible action sequences or rationales alone do not establish success.
+- Explain which task cohort benefits and which failure modes remain; passing the included injection cases does not establish general robustness.
 
-   **Gợi ý:** Xét ý nghĩa tham số, quyền, trạng thái ứng dụng và tác dụng phụ; schema chỉ kiểm tra một phần hợp đồng.
+## Self-check questions
 
-2. Nếu công cụ trả timeout, vì sao không thể luôn gọi lại ngay với cùng tham số?
+1. Which failures can be corrected by changing the model policy, and which require orchestration or tool-contract changes?
 
-   **Gợi ý:** Phân biệt thao tác chỉ đọc với thao tác có tác dụng phụ; xem tính lặp an toàn và khả năng lần đầu đã thành công.
+   **Hint:** Separate action selection from state integrity, authorization, execution semantics, and recovery.
 
-3. Làm thế nào để chứng minh tác tử có ích hơn một workflow cố định cho cùng nhóm nhiệm vụ?
+2. How can persisted memory degrade an agent even when every stored entry was originally correct?
 
-   **Gợi ý:** So sánh tỷ lệ hoàn thành, chất lượng, chi phí và các ca thất bại trên cùng tập đánh giá.
+   **Hint:** Consider stale facts, changed authority, retrieval of irrelevant history, and context-budget competition.
 
-## Checklist hoàn thiện
+3. Why is equal maximum call budget insufficient to establish that two agent architectures have equal cost or reliability?
 
-- [ ] Thêm ví dụ lời gọi hợp lệ, sai ngữ nghĩa, bị từ chối quyền và prompt injection trong dữ liệu.
-- [ ] Chạy lại lab với công cụ mô phỏng, cấu hình cố định và ca kiểm tra mọi nhánh kết thúc quan trọng.
-- [ ] Viết đáp án gợi ý cho câu hỏi tự kiểm tra và quy tắc chấm kết quả nhiệm vụ.
-- [ ] Bổ sung lỗi thường gặp: vòng lặp không dừng, retry gây lặp thao tác, bỏ qua quyền và lưu bí mật trong trace.
-- [ ] Kiểm tra tài liệu tham khảo và nhờ người khác rà soát schema, quyền cùng bộ tình huống đối kháng.
+   **Hint:** Inspect actual calls, token lengths, retries, dependency chains, and repeated-trial outcomes.
 
-## Tài liệu tham khảo
+## Completion checklist
 
-- [Hugging Face Agents Course: What are Agents?](https://huggingface.co/learn/agents-course/unit1/what-are-agents) — điểm vào cho khái niệm tác tử và tương tác với công cụ.
-- [Tài liệu chính thức vLLM](https://docs.vllm.ai/en/latest/) — tra cứu khả năng phục vụ mô hình; đối chiếu hỗ trợ đầu ra có cấu trúc và gọi công cụ theo phiên bản.
+- [ ] Add architectural examples that separate policy, context, memory, state, contracts, and authority.
+- [ ] Execute the experiment specification and fault cases with recorded configurations, traces, and repeated outcomes.
+- [ ] Write answer guidance and rubrics for architecture comparison, failure attribution, and resource accounting.
+- [ ] Document pitfalls including hidden retries, repeated side effects, stale memory, leaked secrets, and rationale-based success judgments.
+- [ ] Check primary references and ask another contributor to review state transitions and fault handling.
 
-## Điều kiện hoàn thành
+## Optional technical deep dive
 
-Người học xây dựng được tác tử giới hạn quyền và tài nguyên, giải thích được từng lời gọi từ trace và xử lý được ca công cụ lỗi.
-Báo cáo phải so sánh với workflow cố định, nêu lợi ích quan sát được và mô tả giới hạn còn lại trước dữ liệu không đáng tin cậy.
+- Study durable execution, concurrent branches, transactional tool operations, and formal state-machine properties.
+- Explore learned tool policies, planning/search, memory selection, and evaluation under distribution shifts.
+- Extend adversarial evaluation, tool isolation, and reliability analysis to systems with external side effects.
 
-**Trước:** [11 · Retrieval và RAG](../11-retrieval-rag/README.md) · **Tiếp:** [13 · Hướng nghiên cứu](../13-research-frontiers/README.md)
+## References
+
+- [ReAct](https://arxiv.org/abs/2210.03629) — interleaving model-generated actions with environment observations.
+- [tau-bench](https://arxiv.org/abs/2406.12045) — task-state evaluation and consistency across repeated tool-agent interactions.
+
+## Completion criteria
+
+Defend the policy/orchestration split, explain observed state and tool failures, and compare architectures at explicit resource and reliability budgets.
+Deliver a reproducible outcome comparison supported by action traces and fault-injection evidence.
+
+**Previous:** [11 · Retrieval Architectures and RAG](../11-retrieval-rag/README.md) · **Next:** [13 · Research Frontiers and Claim Assessment](../13-research-frontiers/README.md)

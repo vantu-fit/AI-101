@@ -1,92 +1,121 @@
-# 07 · Đánh giá LLM và phân tích lỗi
+# 07 · Evaluation and experimental design
 
-[Trang chủ](../../README.md) · [Lộ trình LLM](../README.md)
+[Home](../../README.md) · [LLM roadmap](../README.md)
 
-**Thời lượng dự kiến:** 20 giờ học và thực hành.
+**Estimated core time:** 14 hours. Optional technical extensions and long experiment runs are outside this estimate.
 
-**Học trước:** [05 · Tự xây một GPT nhỏ](../05-build-tiny-gpt/README.md) và [06 · Dữ liệu và pretraining](../06-data-pretraining/README.md).
+**Prerequisites:** [04 · Training dynamics and scaling](../04-training-dynamics-scaling/README.md), [05 · Decoding, uncertainty and model behavior](../05-decoding-model-behavior/README.md) and [06 · Data pipelines and pretraining design](../06-data-pretraining/README.md).
 
-**Trạng thái:** Khung nội dung; các mục chưa đánh dấu đang chờ biên soạn hoặc kiểm tra.
+**Status:** Content scaffold; unchecked items still need to be written or reviewed.
 
-Checkbox thể hiện mức hoàn thiện của tài liệu chung. Điều kiện người học hoàn thành nằm ở cuối bài.
+Checkboxes track shared content readiness. Basic ML evaluation literacy is assumed; this module concentrates on the validity and reproducibility of claims about LLM capabilities and systems.
 
-## Mục tiêu
+## Learning objectives
 
-- Chuyển một mục tiêu sử dụng thành tập đánh giá, metric và điều kiện so sánh.
-- Phân biệt loss, khả năng làm nhiệm vụ, chất lượng hệ thống và chi phí phục vụ.
-- Kiểm tra scorer và phân tích lỗi trước khi tin vào một điểm tổng hợp.
-- Viết kết luận đúng phạm vi bằng chứng, có xét bất định và những yếu tố gây nhiễu.
+- Translate a capability claim into an evaluation construct, comparison protocol, and falsifiable success criterion.
+- Design paired comparisons and distinguish variability across tasks, training runs, generations, and judges.
+- Diagnose contamination, scorer failures, judge biases, and mismatched evaluation conditions.
+- Interpret quality–cost tradeoffs, subgroup regressions, and uncertainty before accepting an improvement claim.
 
-## Checklist nội dung
+## Content checklist
 
-- [ ] Giải thích vai trò train, development/validation, test và cách giữ tập test cuối tách biệt.
-- [ ] Soạn bài về negative log-likelihood và perplexity, bao gồm giới hạn khi tokenizer hoặc corpus khác nhau.
-- [ ] Hướng dẫn chọn accuracy, exact match, F1 và metric theo nhiệm vụ; tránh gộp các thang đo tùy tiện.
-- [ ] Trình bày evaluation protocol: model/tokenizer revision, prompt, chat template, few-shot và decoding.
-- [ ] Viết quy trình kiểm tra answer extraction, normalization, scoring và các trường hợp không hợp lệ.
-- [ ] Phân tích contamination, benchmark overfitting, phân phối mới và giới hạn của điểm leaderboard.
-- [ ] Giới thiệu human evaluation, LLM-as-a-judge, rubric, thiên lệch và đối chiếu bằng mẫu kiểm thủ công.
-- [ ] Soạn phần bất định: kích thước mẫu, so sánh theo từng mẫu, lặp run khi cần và confidence interval.
-- [ ] Hướng dẫn error taxonomy, đánh giá theo nhóm, phân tích hồi quy và báo cáo chất lượng–chi phí.
+- [ ] Explain construct validity using cases where benchmark score, human preference, factual correctness, and deployment utility measure different things.
+- [ ] Define the unit of evaluation, dataset population, source-group structure, and how they constrain generalization claims.
+- [ ] Specify paired comparisons with frozen example IDs, prompts/context, extraction rules, model revisions, and generation settings.
+- [ ] Separate uncertainty from sampled tasks, training randomness, stochastic decoding, and judge variability; plan repeated runs for the relevant source.
+- [ ] Analyze contamination and adaptive benchmark selection, including semantic overlap and limitations of overlap checks.
+- [ ] Audit scorers and normalization using edge cases, per-example inspection, and rescoring of saved outputs.
+- [ ] Examine LLM-judge position, verbosity, and self-preference biases; include blinded manual review and order checks where relevant.
+- [ ] Design subgroup and regression analyses that remain visible alongside aggregate metrics and uncertainty summaries.
+- [ ] Report quality–cost frontiers using actual generation budgets, latency distributions, resource conditions, and failed requests.
 
-## Thực hành đề xuất
+## Proposed lab
 
-### Lab: xây một bộ đánh giá nhỏ có thể kiểm toán
+### Audit and test an improvement claim
 
-Chọn một nhiệm vụ hẹp với đáp án hoặc rubric rõ ràng, chẳng hạn trả lời câu hỏi ngắn từ đoạn văn. Chuẩn bị một tập development và một tập test tách biệt theo tài liệu nguồn.
+**Research question:** Does an intervention from the decoding or data module improve the claimed capability under a defensible comparison, and does the result survive inspection of costs, regressions, and uncertainty?
 
-So sánh hai cấu hình của cùng model hoặc hai model có mục đích tương đương. Khóa prompt và scorer sau khi phát triển trên development; ghi mọi khác biệt có thể ảnh hưởng kết quả.
+**Hypothesis:** State one primary claim, its operational metric, a minimally useful effect chosen for the task, and the outcomes that would weaken or reject the claim. Identify where the metric is only a proxy for the intended capability.
 
-Kiểm thủ công một mẫu đầu vào, đầu ra và điểm trước khi chạy toàn bộ. Tập nhỏ ở đây phục vụ học pipeline, không mặc nhiên đủ cho kết luận nghiên cứu.
+**Controls:** Pair results on the same evaluation items, preserve source-group identities, freeze the scoring protocol before the final comparison, and record differences in compute or model configuration. Repeat the stochastic component relevant to the claim rather than duplicating runs mechanically.
 
-**Sản phẩm cần nộp:**
+**Learner analysis:**
 
-- Định nghĩa nhiệm vụ, tập dữ liệu, rubric và evaluation protocol.
-- Dự đoán theo từng mẫu, điểm thành phần và bản tổng hợp có thể tính lại.
-- Một bảng lỗi theo nhóm và các ví dụ đại diện, gồm cả trường hợp scorer chấm sai.
-- Báo cáo so sánh kèm giới hạn về cỡ mẫu, phân phối và nguồn bất định.
+- Select the construct and experimental unit, justify the baseline, and identify the most plausible confounders.
+- Review a diverse sample and cases driving the result, including disagreements between scorers or judges.
+- Determine whether the effect is meaningful for the target use and whether subgroup regressions change the conclusion.
 
-**Kiểm tra chấp nhận:**
+**Agent execution:**
 
-- Scorer xử lý đúng các ví dụ tự tạo: đáp án đúng, sai, rỗng, sai định dạng và nhiều đáp án.
-- Có thể tính lại điểm từ file dự đoán mà không cần sinh câu trả lời lần nữa.
-- Phân biệt thất bại của model với lỗi prompt, parser hoặc dữ liệu đánh giá.
-- So sánh chính sử dụng cùng tập mẫu; mọi thay đổi protocol được ghi rõ.
+- Implement the protocol, save predictions and scoring intermediates, and run the specified repeated comparisons.
+- Generate paired effect summaries, uncertainty estimates appropriate to the grouping and randomness, and quality–cost reports.
+- Execute judge-order checks or blinded review exports where relevant, retaining failures and disagreements.
 
-Module này mở rộng các kiểm tra train/validation đã xuất hiện ở module 05; evaluation tiếp tục được dùng trong tất cả module phía sau.
+**Artifacts to verify:**
 
-## Câu hỏi tự kiểm tra
+- A claim-to-measurement specification, experimental unit definition, frozen protocol, and contamination audit.
+- Paired predictions with item/group IDs, raw and normalized answers, scores, run IDs, and review annotations.
+- Effect and uncertainty summaries with subgroup regressions, scorer/judge diagnostics, and actual compute costs.
+- A conclusion identifying supported claims, invalid comparisons, unresolved confounders, and required follow-up evidence.
 
-### 1. Vì sao perplexity thấp hơn chưa đủ để nói một chatbot hữu ích hơn?
+**Acceptance criteria:**
 
-**Gợi ý kiểm tra:** Perplexity đo khả năng dự đoán token trên một phân phối cụ thể. Nó không trực tiếp bao quát làm đúng nhiệm vụ, làm theo hướng dẫn hoặc chất lượng tương tác.
+- Saved outputs can be rescored, and examples that determine the main conclusion are inspectable.
+- Repeated generations are not treated as independent task draws; grouping and repeated-run assumptions are documented.
+- Judge preference is not silently relabeled as factual correctness, and benchmark improvements are not generalized beyond their evaluated population.
+- The conclusion accounts for paired differences, uncertainty, failure costs, and regressions rather than only aggregate rank.
 
-### 2. Hai model chênh nhau một điểm accuracy: cần hỏi gì trước khi kết luận?
+**Experiment specification for an implementation agent:**
 
-**Gợi ý kiểm tra:** Hỏi cỡ mẫu, cùng mẫu hay không, scorer, prompt, decoding, contamination và bất định. Kiểm tra những mẫu làm thay đổi kết luận, không chỉ nhìn điểm tổng.
+```text
+Implement the frozen claim-to-measurement protocol and preserve item/group identifiers.
+Compare the baseline and intervention on paired examples with recorded model and generation settings.
+Repeat only the stochastic components specified in the design; retain all outputs and failed cases.
+Audit extraction/scoring edge cases and relevant judge biases; export samples for blinded review.
+Report paired effects, justified uncertainty summaries, subgroup regressions, and actual quality-cost tradeoffs.
+Distinguish observations, proxy measures, and claims that the experiment cannot establish.
+```
 
-### 3. Dùng một LLM mạnh làm giám khảo đã đủ thay thế đáp án chuẩn chưa?
+## Self-check questions
 
-**Gợi ý kiểm tra:** Cần rubric, kiểm thủ công và đánh giá độ ổn định. Giám khảo có thể thiên lệch theo thứ tự, độ dài hoặc phong cách; điểm do giám khảo tạo không tự trở thành ground truth.
+### 1. Why can a statistically clear benchmark gain still fail to support the intended capability claim?
 
-## Checklist hoàn thiện
+**Answer guidance:** The benchmark or scorer may measure a proxy, exploit contamination, omit important subgroups, or differ from the intended use. Precision about an effect does not establish that the measurement captures the desired construct.
 
-- [ ] Có ví dụ đầy đủ từ yêu cầu sử dụng đến dataset, metric và kết luận.
-- [ ] Lab chạy được, lưu dự đoán theo mẫu và cho phép chấm lại độc lập.
-- [ ] Có đáp án và acceptance criteria cho scorer, rubric và báo cáo.
-- [ ] Có ví dụ contamination, parser sai và kết luận vượt quá cỡ mẫu.
-- [ ] Nguồn, phiên bản công cụ và mọi kết quả minh họa đã được kiểm tra.
+### 2. Why do more generations for the same questions not substitute for a broader evaluation set?
 
-## Tài liệu tham khảo
+**Answer guidance:** They help characterize decoding variability on those questions, but do not add independent task coverage. Keep the task-sampling and generation-sampling sources of uncertainty distinct.
 
-- [EleutherAI — Language Model Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness): framework và tài liệu về task, prompt, model backend và metric.
-- [Raschka — LLMs from Scratch](https://github.com/rasbt/LLMs-from-scratch): code và tài liệu bổ sung về đánh giá model, instruction responses và reasoning.
-- [Stanford CS336](https://cs336.stanford.edu/): đặt evaluation trong toàn bộ quy trình dữ liệu, huấn luyện và hậu huấn luyện.
+### 3. What must be checked when an LLM judge prefers a new system but human factual review does not?
 
-## Điều kiện hoàn thành
+**Answer guidance:** Check the rubric, position and length effects, task knowledge, and the examples causing disagreement. The two evaluations may measure different constructs or one may be unreliable.
 
-- Bạn chọn và giải thích được metric phù hợp với nhiệm vụ cụ thể.
-- Bạn tìm được một lỗi scorer hoặc protocol bằng cách kiểm dữ liệu theo từng mẫu.
-- Bạn viết được kết luận phân biệt điều đã đo với điều chưa đủ bằng chứng để khẳng định.
+## Optional technical deep dive
 
-**Trước:** [06 · Dữ liệu và pretraining](../06-data-pretraining/README.md) · **Tiếp:** [08 · SFT và PEFT](../08-sft-peft/README.md)
+- Derive or implement paired bootstrap procedures, clustered resampling, or other uncertainty estimators justified by the design.
+- Study calibration, proper scoring rules, multiple comparisons, and adaptive evaluation mathematically.
+- Build custom harness integrations or scorer tests for a specific research protocol.
+
+## Completion checklist
+
+- [ ] Include a worked claim audit with construct validity, paired evidence, and a qualified conclusion.
+- [ ] Provide runnable evaluation specifications or traceable artifacts with saved outputs and scoring intermediates.
+- [ ] Provide rubrics for baseline fairness, uncertainty assumptions, judge/scorer diagnostics, and claim scope.
+- [ ] Include contamination, pseudoreplication, judge bias, and hidden-regression cases to diagnose.
+- [ ] Verify primary sources, versioned tooling, and all reported evidence; separate implementation extensions.
+
+## References
+
+- [EleutherAI — Language Model Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness): task configuration, model backends, scoring, and reproducible evaluation artifacts.
+- [Zheng et al. — Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685): judge behavior, agreement, and evaluation biases.
+- [Stanford CS336](https://cs336.stanford.edu/): evaluation within empirical language-model development.
+
+References checked on **2026-11-15**.
+
+## Completion criteria
+
+- You can turn a capability claim into a defensible paired experiment with appropriate controls and uncertainty assumptions.
+- You can locate a scorer, judge, contamination, or design flaw and specify the correction needed.
+- You can judge whether a result supports a practical or research decision, including regressions and quality–cost tradeoffs.
+
+**Previous:** [06 · Data pipelines and pretraining design](../06-data-pretraining/README.md) · **Next:** [08 · Fine-tuning and parameter-efficient adaptation](../08-sft-peft/README.md)
