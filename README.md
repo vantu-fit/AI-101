@@ -1,57 +1,37 @@
 # AI-101
 
-Understand AI mechanisms, assess evidence, and design useful systems. This repository starts with **large language models (LLMs)** and uses English throughout.
+Understand how AI works, starting with **large language models (LLMs)**. This repository uses English throughout.
 
-The LLM curriculum is written for learners who already have **solid programming and machine-learning foundations**. It concentrates on what is specific to LLMs: representations, Transformer architecture, context behavior, training and scaling, decoding, adaptation, reasoning, evaluation, and system design.
+**Start with the [six-stage LLM roadmap](llm/README.md).** Learn how models learn, understand LLM internals, build a small GPT, evaluate data and results, adapt a pretrained model, and build a document question-answering application.
 
-Implementation agents can write code, prepare environments, and execute experiments. The learner owns the technical question, experimental controls, interpretation, and resulting design decision. Detailed mathematical derivations, tensor exercises, and implementation from scratch are optional extensions.
+The core has **six stages and three practical outputs**. The 15 numbered topic folders are a supporting reference library; completing every folder or advanced experiment is not required.
 
-**Current scope:** 15 LLM submodules, approximately **160 hours of active study and experimental analysis**. Long machine runtimes and optional extensions are outside this estimate.
+## What you will produce
 
-**Content status:** the repository contains the roadmap, detailed submodule outlines, experiment specifications, and contributor checklists. Full lessons and verified experiment artifacts are still being developed.
+1. **A small GPT:** explain its training and generation, inspect its results, and diagnose a basic failure.
+2. **A fine-tuned model with a comparison report:** evaluate the baseline and adapted model on held-out data, including regressions.
+3. **A document QA application:** retrieve evidence, answer with citations, and distinguish retrieval failures from answer failures.
 
-## Audience and assumed background
+See the [project briefs and completion criteria](llm/README.md#three-practical-outputs).
 
-Learners should already be comfortable with:
+## Background and learning approach
 
-- Programming, reading technical documentation, and working with software tools.
-- Standard ML concepts: training objectives, optimization, generalization, overfitting, and data splits.
-- Basic probability and vector representations at the level needed to interpret a technical explanation.
-- Comparing experimental results and distinguishing a measurement from an unsupported claim.
+The path assumes solid programming and machine-learning foundations. Stage 1 is a short diagnostic and refresher. Review mathematics or PyTorch only when a gap blocks the next explanation or experiment.
 
-The core begins with LLM-specific mechanisms. Introductory programming, generic ML tutorials, chatbot onboarding, and prompt-writing lessons are outside its scope.
+Implementation agents may prepare environments, write code, and execute experiments. The learner defines the question and controls, inspects the evidence, explains failures, and makes the technical decision. Detailed derivations and writing every component from scratch are optional.
 
-## Start here
+Plan for approximately **12–16 weeks at 8–10 hours per week**, adjusted to your starting point. Long machine runtimes and optional study are outside this estimate. Advance when you meet a stage's completion criteria.
 
-1. Review the [LLM systems map](llm/00-llm-systems-map/README.md) and identify the mechanisms you cannot yet explain.
-2. Use the [full roadmap](llm/README.md) to choose the relevant modules and check their prerequisites.
-3. Work through an experiment by stating a hypothesis, fixing the controls, and delegating implementation to an agent.
-4. Inspect the artifacts, explain the result, and connect it to a model or system decision.
-5. Reuse these artifacts in the [capstone](llm/14-capstone/README.md).
-
-Skip material you can already demonstrate through the module's completion criteria. Time estimates are planning aids, not graduation requirements.
+**Content status:** the repository contains a learning plan, topic outlines, and experiment specifications. Complete lessons and verified project artifacts are still being developed.
 
 ## Repository structure
 
 | Path | Purpose |
 | --- | --- |
-| [README.md](README.md) | Audience, learning approach, repository organization, and contribution workflow. |
-| [llm/README.md](llm/README.md) | Module sequence, prerequisites, estimated time, and competency checkpoints. |
-| `llm/<number>-<topic>/README.md` | Learning objectives, contributor checklists, experiment specification, references, and completion criteria. |
+| [llm/README.md](llm/README.md) | The main six-stage path, three project briefs, and optional reading map. |
+| `llm/<number>-<topic>/README.md` | Supporting explanations to develop, experiment specifications, primary references, and contributor checklists. |
 
-Keep supporting explanations, notebooks, code, figures, and reports inside the relevant submodule. Add files when material exists and link them from its README.
-
-## Division of work
-
-| Work | Learner | Implementation agent |
-| --- | --- | --- |
-| Question and hypothesis | Identify the mechanism, prediction, and competing explanation. | Check feasibility and identify missing experimental details. |
-| Experimental design | Choose interventions, controls, data, metrics, and resource limits. | Translate the specification into executable work. |
-| Execution | Review material deviations from the design. | Prepare data and environments, implement, run, and record artifacts. |
-| Interpretation | Inspect evidence, diagnose confounders, and state the limits of the conclusion. | Organize outputs, measurements, examples, and comparisons. |
-| System decision | Choose an architecture, configuration, or next experiment. | Implement the selected change and repeat the agreed evaluation. |
-
-Generated explanations do not establish how a model internally computed an answer. Use observable evidence and distinguish measurements, source-reported results, and hypotheses.
+Keep notes, notebooks, code, figures, and reports in the relevant topic folder and link them from its README. Use the roadmap to choose what to study; the folders' numbering and previous/next links organize the reference library.
 
 ## Contribution workflow
 
@@ -64,19 +44,16 @@ Generated explanations do not establish how a model internally computed an answe
 5. Change `- [ ]` to `- [x]` only after the deliverable exists and has been verified.
 6. Describe the change and verification in a commit or pull request.
 
-Each submodule's checklist is the record of its development status. A title, placeholder, or reference link alone does not complete an authoring item.
+A title, placeholder, or reference link alone does not complete an authoring item.
 
 ## Contribution standards
 
-- Assume the stated technical background and concentrate on LLM-specific mechanisms.
-- Connect each mechanism to a testable prediction or consequential system choice.
-- Use equations when they clarify an idea; place lengthy derivations and tensor programming in the optional section.
-- Specify the experimental question, hypothesis, controls, artifacts, and acceptance criteria.
-- Separate architecture effects, data effects, training effects, and inference effects where the evidence permits.
-- Cite original research, author-provided material, or official documentation for technical claims.
-- Preserve model/data/configuration versions, raw results, failures, and resource assumptions with executable artifacts.
-- Clearly label illustrative examples, reviewed source results, and experiments that actually ran.
 - Use English, Markdown, and relative links within the repository.
+- Keep the core focused; place lengthy derivations, advanced systems work, and research extensions in the reference library.
+- Connect each mechanism to a question, controlled comparison, or useful system decision.
+- Record assumptions, controls, model/data/code/configuration versions, raw results, failures, and resource limits with executable artifacts.
+- Cite primary research or official documentation. Distinguish illustrative examples, source-reported results, and experiments that actually ran.
+- Separate data, architecture, training, and inference effects where the evidence permits. Generated explanations alone do not establish a model's internal computation.
 
 ## Before submitting a contribution
 
@@ -89,8 +66,4 @@ Copy this checklist into a pull request when useful; leave the template unchange
 - [ ] Questions include answer guidance, and limitations follow from the available evidence.
 - [ ] Only completed and verified content items are checked in the submodule README.
 
-## What completion means
-
-A learner can **explain a mechanism**, **predict the effect of a change**, **design a controlled test**, and **justify a model or system decision from evidence**. The implementation may be delegated; responsibility for the conclusion remains with the learner.
-
-The curriculum was revised for this audience on **15 November 2026**. Check version-dependent documentation when adding executable instructions.
+Updated **15 November 2026**. Recheck version-dependent documentation when adding executable instructions.
